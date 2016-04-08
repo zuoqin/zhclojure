@@ -22,17 +22,17 @@
 	      dalmatians (take 2 dalmatian-list)
   
 	      ]
-	    (println "Found total documents")
-	 	(println (mc/count db coll))   
+	    ;(println "Found total documents")
+	 	;(println (mc/count db coll))   
 		;(mc/find db coll {:name "Bob"}))
 		;; find one document by id, as `com.mongodb.DBObject` instance
-		(println (mc/find-one db coll { :name "Bob" }))
+		;(println (mc/find-one db coll { :name "Bob" }))
 
-	    (println)
-	    (println)
-	    (println)
-	    (doseq [item (map list (mc/find-maps db coll))] 
-	        (println item))
+	    ;(println)
+	    ;(println)
+	    ;(println)
+	    ;(doseq [item (map list (mc/find-maps db coll))] 
+	    ;    (println item))
 	    	
 
 

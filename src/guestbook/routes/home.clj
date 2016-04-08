@@ -2,7 +2,8 @@
   (:require [compojure.core :refer :all]
             [guestbook.views.layout :as layout]
 			[hiccup.form :refer :all]
-			[guestbook.models.db :as db]))
+			[guestbook.models.db :as db]
+			[guestbook.controllers.scrape3 :as scrape]))
 
 
 
@@ -11,8 +12,7 @@
 
 (defn show-guests []
 	[:ul.guests
-		(for [{:keys [message name timestamp]} (db/read-guests)]
-		;[{:keys [message name timestamp]}]
+		(for [{:keys [message name timestamp]} (scrape/print-headlines-and-points)]  ; (db/read-guests)]
 			;[{:message "Howdy" :name "Bob" :timestamp nil}
 			;{:message "Hello" :name "Bob" :timestamp nil}]]
 		[:li
@@ -54,7 +54,8 @@
 		(home name message "Don't you have something to say?")
 		:else
 		(do
-			(println name message)
+			(scrape/print-headlines-and-points)
+			;(println name message)
 			(home))))
 
 

@@ -6,7 +6,7 @@
                  [hiccup "1.0.5"]
                  [ring-server "0.3.1"]
                  [com.novemberain/monger "3.0.2"]
-
+                 [enlive "1.1.1"]
                  ]
   :plugins [[lein-ring "0.8.12"]]
   :ring {:handler guestbook.handler/app
