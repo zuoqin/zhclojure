@@ -1,9 +1,12 @@
 (ns guestbook.routes.home
-  (:require [compojure.core :refer :all]
-            [guestbook.views.layout :as layout]
-			[hiccup.form :refer :all]
-			[guestbook.models.db :as db]
-			[guestbook.controllers.scrape3 :as scrape]))
+  	(:require [compojure.core :refer :all]
+        [guestbook.views.layout :as layout]
+		[hiccup.form :refer :all]
+		[guestbook.models.db :as db]
+		[guestbook.controllers.scrape3 :as scrape]
+		[guestbook.routes.page :as page]
+	)
+)
 
 
 
@@ -61,4 +64,7 @@
 
 (defroutes home-routes
 	(GET "/" [] (home))
-	(POST "/" [name message] (save-message name message)))
+	(POST "/" [name message] (save-message name message))
+	(GET "/page/:id" [id] (page/display-page id))
+	(GET "/story/:reference" [reference] (page/display-story reference))
+)
