@@ -1,21 +1,21 @@
-(defproject guestbook "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
-  :url "http://example.com/FIXME"
-  :dependencies [[org.clojure/clojure "1.6.0"]
-                 [compojure "1.1.6"]
-                 [hiccup "1.0.5"]
-                 [ring-server "0.3.1"]
-                 [com.novemberain/monger "3.0.2"]
-                 [enlive "1.1.1"]
-                 ]
-  :plugins [[lein-ring "0.8.12"]]
-  :ring {:handler guestbook.handler/app
-         :init guestbook.handler/init
-         :destroy guestbook.handler/destroy}
-  :profiles
-  {:uberjar {:aot :all}
-   :production
-   {:ring
-    {:open-browser? false, :stacktraces? false, :auto-reload? false}}
-   :dev
-   {:dependencies [[ring-mock "0.1.5"] [ring/ring-devel "1.3.1"]]}})
+(defproject zerohedgecl "0.0.2"
+  :description "Shouter app"
+  :url "https://github.com/technomancy/shouter"
+  :min-lein-version "2.0.0"
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :dependencies [[org.clojure/clojure "1.7.0"]
+                 [org.clojure/java.jdbc "0.4.1"]
+                 [org.postgresql/postgresql "9.4-1201-jdbc41"]
+                 [ring/ring-jetty-adapter "1.4.0"]
+                 [compojure "1.4.0"]
+                 [ring/ring-defaults "0.1.2"]
+                 [hiccup "1.0.5"]]
+  :main ^:skip-aot zerohedgecl.core
+  :uberjar-name "zerohedgecl.jar"
+  :plugins [[lein-ring "0.8.13"]]
+  :ring {:handler zerohedgecl.core/application
+         }
+  :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
+                                  [ring-mock "0.1.5"]]}
+             :uberjar {:aot :all}})
