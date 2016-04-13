@@ -9,6 +9,11 @@
 
 )
 
+(def pages (atom []))
+
+(def stories (atom []))
+
+
 (def spec (or (System/getenv "DATABASE_URL")
               "postgresql://localhost:5432/shouter"))
 
@@ -163,16 +168,43 @@
 
 (defn loadPage [pageid]
   (let [
-    page (slurp (str "http://www.zerohedge.com/?page=" pageid))
-    output (str/split page #"<div class=\"content-box-1\">")
-    listofintro (map get-introduction output)
-    dalmatians (take-last (- (count listofintro) 1) listofintro)
-    outarr (into [] dalmatians)
+
+    
+    page (
+      if (< (count (filter #(= (compare (% :pageid) pageid) 0 ) @pages )) 1)
+        (slurp (str "http://www.zerohedge.com/?page=" pageid))
+        
+    )
+    
+    
+    outarr (into [] 
+        (
+        if (< (count (filter #(= (compare (% :pageid) pageid) 0 ) @pages )) 1)
+          (take-last (- (count (map get-introduction (str/split page #"<div class=\"content-box-1\">"))) 1) 
+            (map get-introduction (str/split page #"<div class=\"content-box-1\">")))
+
+          
+
+
+          (filter #(= (compare (% :pageid) pageid) 0 ) @pages )
+        )
+
+      )
     
     ]
 
+    (
+      if (< (count (filter #(= (compare (% :pageid) pageid) 0 ) @pages )) 1)
+        (doseq [x outarr] 
 
-    ;(println page)
+           (swap! pages conj 
+
+              ;{:pageid pageid :updated "jhkjh"}
+              {:pageid pageid :updated (:updated x) :introduction (:introduction x) :title (:title x) :reference (:reference x) }
+           )
+        )
+    )
+
 
     outarr
     

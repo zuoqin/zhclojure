@@ -6,6 +6,9 @@
             [zerohedgecl.models.pageM :as pageM]
   )
 )
+(def pages (atom []))
+
+(def stories (atom []))
 
 (defn shout-form []
   [:div {:id "shout-form" :class "sixteen columns alpha omega"}
@@ -28,12 +31,40 @@
                  (display-shouts shouts)))
 
 
+(defn loadandsetpage [pageid]
+  (
+    let
+      [
+        page (pageM/loadPage pageid)
+
+      ]
+
+      ;(println "in loadandsetpage")
+
+        
 
 
+      
 
-(defn show-items [pageid]
+
+      page
+
+
+  )
+  
+)
+
+(defn get-page-items [found pageid]
+  (if (< found 1)
+    (loadandsetpage pageid) ;(pageM/loadPage pageid)
+    (filter #(= (compare (% :pageid) pageid) 0 ) @pages )
+  )
+)
+
+(defn build-items-html [all-items]
+
   [:div#blogItems.col-md-12 {:style "margin-top: 60px;"}
-    (for [{:keys [title updated introduction reference]} (pageM/loadPage pageid)] 
+    (for [{:keys [title updated introduction reference]} all-items] 
       [:div {:class "panel-primary"}
         [:div {:class "panel-heading"}
           [:h3 {:class "panel-title"}
@@ -50,7 +81,21 @@
 
     )
   ]
+)
 
+(defn show-items [pageid]
+  (let [
+    foundpage (count (filter #(= (compare (% :pageid) pageid) 0 ) @pages ))
+
+    all-items (get-page-items foundpage pageid)
+
+    ] 
+
+    (
+      build-items-html all-items
+
+    )
+  )
 
 )
 
@@ -80,9 +125,9 @@
               [:a {:href "/page/4"} "Page 4"]
             ]
 
-            [:li {:id="page5li"}
-              [:a {:href "/page/5"} "Page 5"]
-            ]
+            ; [:li {:id="page5li"}
+            ;   [:a {:href "/page/5"} "Page 5"]
+            ; ]
 
           ]
         ]
