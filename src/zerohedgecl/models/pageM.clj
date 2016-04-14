@@ -192,23 +192,27 @@
 (defn loadPage [pageid]
   (let [
 
-    
+    id(
+      if( .startsWith (.getName (.getClass  pageid)) "java.lang.String")
+        (Integer. pageid)
+        pageid
+    )
     page (
-      if (< (count (filter #(= (compare (% :pageid) pageid) 0 ) @pages )) 1)
-        (slurp (str "http://www.zerohedge.com/?page=" pageid))
+      if (< (count (filter #(= (compare (% :pageid) id) 0 ) @pages )) 1)
+        (slurp (str "http://www.zerohedge.com/?page=" id))
         
     )
     
     
     outarr (into [] 
         (
-        if (> (count (filter #(= (compare (% :pageid) pageid) 0 ) @pages )) 0)
+        if (> (count (filter #(= (compare (% :pageid) id) 0 ) @pages )) 0)
           (
             if (
                 <
                 (t/in-minutes 
                   (t/interval 
-                    (f/parse  (f/formatters :date-hour-minute-second-ms) (.format (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS") (:downloaded (first (filter #(= (compare (% :pageid) pageid) 0 ) @pages ) ))))
+                    (f/parse  (f/formatters :date-hour-minute-second-ms) (.format (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS") (:downloaded (first (filter #(= (compare (% :pageid) id) 0 ) @pages ) ))))
                     (f/parse  (f/formatters :date-hour-minute-second-ms) (.format (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS") (now)) )    
                     
                   )
@@ -216,7 +220,7 @@
                 (pagelifetime)
               )
 
-              (filter #(= (compare (% :pageid) pageid) 0 ) @pages )
+              (filter #(= (compare (% :pageid) id) 0 ) @pages )
           )
 
           (take-last (- (count (map get-introduction (str/split page #"<div class=\"content-box-1\">"))) 1) 
@@ -235,12 +239,12 @@
 
     (
       if (or
-           ( < (count (filter #(= (compare (% :pageid) pageid) 0 ) @pages )) 5)
+           ( < (count (filter #(= (compare (% :pageid) id) 0 ) @pages )) 5)
            (
             >
             (t/in-minutes 
               (t/interval 
-                (f/parse  (f/formatters :date-hour-minute-second-ms) (.format (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS") (:downloaded (first (filter #(= (compare (% :pageid) pageid) 0 ) @pages ) ))))
+                (f/parse  (f/formatters :date-hour-minute-second-ms) (.format (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS") (:downloaded (first (filter #(= (compare (% :pageid) id) 0 ) @pages ) ))))
                 (f/parse  (f/formatters :date-hour-minute-second-ms) (.format (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS") (now)) )    
                 
               )
@@ -248,18 +252,18 @@
             (pagelifetime)
            )
           )
-          (delete-page-by-number pageid)
+          (delete-page-by-number id)
     )
 
 
     (
-      if (< (count (filter #(= (compare (% :pageid) pageid) 0 ) @pages )) 1)
+      if (< (count (filter #(= (compare (% :pageid) id) 0 ) @pages )) 1)
         (doseq [x outarr] 
 
            (swap! pages conj 
 
               ;{:pageid pageid :updated "jhkjh"}
-              {:pageid pageid :downloaded (now) :updated (:updated x) :introduction (:introduction x) :title (:title x) :reference (:reference x) }
+              {:pageid id :downloaded (now) :updated (:updated x) :introduction (:introduction x) :title (:title x) :reference (:reference x) }
            )
         )
     )
