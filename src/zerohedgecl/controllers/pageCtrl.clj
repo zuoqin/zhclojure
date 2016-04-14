@@ -21,7 +21,7 @@
   (ring/redirect "/"))
 
 (defroutes routes
-  (GET  "/" [] (index))
+  (GET  "/" [] (pageVw/display-page 0))
   (POST "/" [shout] (create shout))
 
 
