@@ -189,6 +189,20 @@
      (swap! pages #(remove (fn [page] (= (:pageid page) num)) %)))
 
 
+(defn refresh-page-cache [id array]
+
+  (delete-page-by-number id)
+
+  (doseq [x array] 
+
+     (swap! pages conj 
+
+        ;{:pageid pageid :updated "jhkjh"}
+        {:pageid id :downloaded (now) :updated (:updated x) :introduction (:introduction x) :title (:title x) :reference (:reference x) }
+     )
+  )
+)
+
 (defn loadPage [pageid]
   (let [
 
@@ -264,42 +278,8 @@
            )
         )
 
-        (delete-page-by-number id)
-
-
-        ; (doseq [x outarr] 
-
-        ;    (swap! pages conj 
-
-        ;       ;{:pageid pageid :updated "jhkjh"}
-        ;       {:pageid id :downloaded (now) :updated (:updated x) :introduction (:introduction x) :title (:title x) :reference (:reference x) }
-        ;    )
-        ; )          
-    )
-
-
-    (
-      if (or
-           ( < (count (filter #(= (compare (% :pageid) id) 0 ) @pages )) 5)
-           (
-            >
-            (t/in-minutes 
-              (t/interval 
-                (f/parse  (f/formatters :date-hour-minute-second-ms) (.format (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS") (:downloaded (first (filter #(= (compare (% :pageid) id) 0 ) @pages ) ))))
-                (f/parse  (f/formatters :date-hour-minute-second-ms) (.format (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS") (now)) )    
-                
-              )
-            )
-            (pagelifetime)
-           )
-        )
-        (doseq [x outarr] 
-
-           (swap! pages conj 
-
-              ;{:pageid pageid :updated "jhkjh"}
-              {:pageid id :downloaded (now) :updated (:updated x) :introduction (:introduction x) :title (:title x) :reference (:reference x) }
-           )
+        (
+          refresh-page-cache id outarr
         )
     )
 

@@ -22,7 +22,7 @@
 (defn page [& body]
   (h/html5
     [:head
-     [:title "Welcome to guestbook"]
+     [:title "ZeroHedge"]
      (h/include-css "/stylesheets/screen.css")
      (h/include-css "/stylesheets/bootstrap.css")
      (h/include-css "/stylesheets/bootstrap-theme.css")
