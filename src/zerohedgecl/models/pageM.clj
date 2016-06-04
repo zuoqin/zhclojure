@@ -20,20 +20,10 @@
 
 (defn now [] (new java.util.Date))
 
-
-(def spec (or (System/getenv "DATABASE_URL")
-              "postgresql://localhost:5432/shouter"))
-
 (defn all []
   ;(into [] (sql/query spec ["select * from shouts order by id desc"]))
   [{:name "First" :action "About"} {:name "Second" :action "Help"}]
 )
-
-(defn create [shout]
-  (sql/insert! spec :shouts [:body] [shout]))
-
-
-
 
 (defn createStoryMessage [title updated body]
   (let []
@@ -41,7 +31,9 @@
   )
 )
 
-(defn download-story [reference]
+(defn download-story
+  "Downloading story from ZeroHedge by reference"
+  [reference]
   (let [
     
     page (
@@ -62,19 +54,22 @@
           ;updated
           (subs page 
             
-            ( + (.indexOf page " on  "
-              (+ (.indexOf page "<span class=\"submitted\">" 0) 0 )
-            ) 6 )
+            ( + (.indexOf page ">"
+                (+ (.indexOf page "<span title"  (+ (.indexOf page "link-created last" 0) 0 ) ) 0 )
+            ) 1 )
             
             ( - (.indexOf page "</span>"
-              (+ (.indexOf page "<span class=\"submitted\">" 0) 0 )
-            ) 6 )
+               (.indexOf page ">"
+                (+ (.indexOf page "<span title"  (+ (.indexOf page "link-created last" 0) 0 ) ) 0 )
+            )
+            ) 0 )
           )
 
           ; body
           (subs page 
-            (+ (.indexOf page "<div class=\"clear-block clear\">&nbsp;</div>" 0) 43 )
-            (+ (.indexOf page "<div class=\"fivestar-static-form-item\">" 0) 0 )
+            (+ (.indexOf page "<div class=\"content\">" 0) 21 )
+            (+ (.indexOf page "<div class=\"taxonomy\">" (.indexOf page "<div class=\"content\">" 0)
+               ) 0 )
           )
         )
 
@@ -106,76 +101,74 @@
 
 
 (defn get-introduction [source]
- (createMessage
-    
-    ;title
-    (subs source 
-      (+
-        (.indexOf source ">"
-              (+ (.indexOf source "<h2 class=\"title\">" 0) 20 )
-        )
-        1
-      )
+   ( let [
+       reference (str 
+            (URLEncoder/encode (str "http://www.zerohedge.com"
+              (subs source 
+                (+
+                  (.indexOf source "href=\""
+                        (+ (.indexOf source "<h2 class=\"title\">" 0) 20 )
+                  )
+                  6
+                )
 
-      (.indexOf source "</a>"
-            (+ (.indexOf source "<h2 class=\"title\">" 0) 20)
-      ) 
-    )
-
-    
-    ;updated
-    (subs source 
-      (+
-        (.indexOf source "</a> on"
-              (+ (.indexOf source "<h2 class=\"title\">" 0) 20 )
-        )
-        8
-      )
-
-      (.indexOf source "</span>"
-            (+ (.indexOf source "<h2 class=\"title\">" 0) 20)
-      ) 
-    )
-
-    
-    ;introduction
-    (subs source 
-      (+
-        (.indexOf source "</a> on"
-              (+ (.indexOf source "<h2 class=\"title\">" 0) 20 )
-        )
-        34
-      )
-
-      (+
-        (.indexOf source "</div>"
-              (+ (.indexOf source "<h2 class=\"title\">" 0) 20)
-        ) 0
-      )
-    )
-
-    
-    ;reference
-    (str 
-      (URLEncoder/encode 
-        (subs source 
+                (.indexOf source "\">"
+                  (.indexOf source "href=\""
+                        (+ (.indexOf source "<h2 class=\"title\">" 0) 20 )
+                  )
+                )
+              )            
+            ) 
+              "UTF-8"
+            )
+          )
+       title (subs source 
           (+
-            (.indexOf source "href=\""
+            (.indexOf source ">"
                   (+ (.indexOf source "<h2 class=\"title\">" 0) 20 )
             )
-            6
+            1
           )
 
-          (.indexOf source "\">"
-            (.indexOf source "href=\""
-                  (+ (.indexOf source "<h2 class=\"title\">" 0) 20 )
-            )
+          (.indexOf source "</a>"
+                (+ (.indexOf source "<h2 class=\"title\">" 0) 20)
+          ) 
+       )
+       introduction (subs source 
+          (+ (.indexOf source "<div class=\"teaser-text\">" 0) 25 )
+          
+          (+
+            (.indexOf source "</div>"
+                  (+ (.indexOf source "<div class=\"teaser-text\">" 0) 20)
+            ) 0
           )
-        )
-        "UTF-8"
-      )
-    )
+       )
+       updated (subs source
+            
+            ( + (.indexOf  source  ">"
+                (+ (.indexOf source "<span title"  (+ (.indexOf source "link-created" 0) 0 ) ) 0 )
+            ) 1 )
+            
+            ( - (.indexOf source "</span>"
+               (+ (.indexOf source "<span title"  (+ (.indexOf source "link-created" 0) 0 ) ) 0 )
+            ) 0 )
+          )   
+    ]
+    ;(println "==================")
+    ;(println updated)
+    ;(println "=========================================================================")
+    (createMessage
 
+      ;title
+      title
+      ;(str "My Title") 
+      ;(str "My updated")
+      updated
+      introduction
+      ;(str "My Introduction")
+      ;(str "My reference")
+      reference
+    )  
   )
 )
 
@@ -222,10 +215,15 @@
 )
 
 (defn parse-zerohedge-page [page id]
-  (
-    let [outarr   (take-last (- (count (map get-introduction (str/split page #"<div class=\"content-box-1\">"))) 1) 
-      (map get-introduction (str/split page #"<div class=\"content-box-1\">")))
+  (    
+    let [ 
+    mainContent (nth (str/split page #"</section>") 1) 
+    contentItems (str/split mainContent #"views-row views-row-")
+    contentItemsCount (count contentItems)
+    items (take-last (- contentItemsCount 1) contentItems)
+    outarr (map get-introduction items)
     ]
+    ;(println mainContent)
     (refresh-page-cache id outarr)
     outarr
   )

@@ -14,16 +14,14 @@
   (pageVw/display-story (pageM/download-story reference)  )
 )
 
-(defn create
-  [shout]
-  (when-not (str/blank? shout)
-    (pageM/create shout))
-  (ring/redirect "/"))
+; (defn create
+;   [shout]
+;   (when-not (str/blank? shout)
+;     (pageM/create shout))
+;   (ring/redirect "/"))
 
 (defroutes routes
   (GET  "/" [] (pageVw/display-page "0"))
-  (POST "/" [shout] (create shout))
-
 
   (GET "/page/:id" [id] (pageVw/display-page id))
   (GET "/story/:reference" [reference] (display-story reference))
