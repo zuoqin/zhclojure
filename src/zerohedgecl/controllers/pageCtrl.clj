@@ -6,7 +6,8 @@
             [zerohedgecl.models.pageM :as pageM]))
 
 (defn index []
-  (pageVw/index (pageM/all))
+  (pageVw/display-page "0")
+
 )
 
 
@@ -20,10 +21,14 @@
 ;     (pageM/create shout))
 ;   (ring/redirect "/"))
 
-(defroutes routes
+(defroutes app-routes
   (GET  "/" [] (pageVw/display-page "0"))
-
   (GET "/page/:id" [id] (pageVw/display-page id))
   (GET "/story/:reference" [reference] (display-story reference))
+
+)
+
+(defroutes api-routes
+  (GET "/api/page/:id" [id] (pageVw/api-page id))
 
 )
