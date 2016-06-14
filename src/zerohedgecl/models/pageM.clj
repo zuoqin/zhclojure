@@ -103,18 +103,18 @@
 (defn get-introduction [source]
    ( let [
        reference (str 
-            (URLEncoder/encode (str "http://www.zerohedge.com"
+            (URLEncoder/encode (str "http://zerohedge.com"
               (subs source 
                 (+
                   (.indexOf source "href=\""
-                        (+ (.indexOf source "<h2 class=\"title\">" 0) 20 )
+                        (+ (.indexOf source "<h2 class=\"title teaser-title\">" 0) 20 )
                   )
                   6
                 )
 
                 (.indexOf source "\">"
                   (.indexOf source "href=\""
-                        (+ (.indexOf source "<h2 class=\"title\">" 0) 20 )
+                        (+ (.indexOf source "<h2 class=\"title teaser-title\">" 0) 20 )
                   )
                 )
               )            
@@ -125,21 +125,21 @@
        title (subs source 
           (+
             (.indexOf source ">"
-                  (+ (.indexOf source "<h2 class=\"title\">" 0) 20 )
+                  (+ (.indexOf source "<h2 class=\"title teaser-title\">" 0) 32 )
             )
             1
           )
 
           (.indexOf source "</a>"
-                (+ (.indexOf source "<h2 class=\"title\">" 0) 20)
+                (+ (.indexOf source "<h2 class=\"title teaser-title\">" 0) 32)
           ) 
        )
        introduction (subs source 
-          (+ (.indexOf source "<div class=\"teaser-text\">" 0) 25 )
+          (+ (.indexOf source "<span class=\"teaser-text\">" 0) 0 )
           
           (+
-            (.indexOf source "</div>"
-                  (+ (.indexOf source "<div class=\"teaser-text\">" 0) 20)
+            (.indexOf source "</section>"
+                  (+ (.indexOf source "<span class=\"teaser-text\">" 0) 0)
             ) 0
           )
        )
@@ -217,7 +217,7 @@
 (defn parse-zerohedge-page [page id]
   (    
     let [ 
-    mainContent (nth (str/split page #"</section>") 1) 
+    mainContent (nth (str/split page #"<div class=\"view-content\">") 1) 
     contentItems (str/split mainContent #"views-row views-row-")
     contentItemsCount (count contentItems)
     items (take-last (- contentItemsCount 1) contentItems)

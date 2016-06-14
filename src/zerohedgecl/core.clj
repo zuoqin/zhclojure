@@ -32,10 +32,7 @@
   (route/not-found (layout/four-oh-four)))
 
 (def application
-  (routes (-> api-routes
-               (middleware/wrap-json-body)
-               (middleware/wrap-json-response)
-          )
+  (routes
           (-> app-routes
               (wrap-app-middleware)))
 )
