@@ -38,7 +38,7 @@
     
     page (
       if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0)
-        (slurp (URLDecoder/decode reference))
+        (slurp (str "http://zerohedge.com" (URLDecoder/decode  reference)) )
         
     )
     listofintro
@@ -68,7 +68,10 @@
           ; body
           (subs page 
             (+ (.indexOf page "<div class=\"content\">" 0) 21 )
-            (+ (.indexOf page "<div class=\"taxonomy\">" (.indexOf page "<div class=\"content\">" 0)
+            (+ 
+               (if ( = (.indexOf page "<div class=\"taxonomy\">" (.indexOf page "<div class=\"content\">" 0)) -1) 
+		              (.indexOf page "<div class=\"node-full_links\">" (.indexOf page "<div class=\"content\">" 0) )
+                  (.indexOf page "<div class=\"taxonomy\">" (.indexOf page "<div class=\"content\">" 0) ) 
                ) 0 )
           )
         )
@@ -103,7 +106,7 @@
 (defn get-introduction [source]
    ( let [
        reference (str 
-            (URLEncoder/encode (str "http://zerohedge.com"
+            (URLEncoder/encode (str ""
               (subs source 
                 (+
                   (.indexOf source "href=\""
