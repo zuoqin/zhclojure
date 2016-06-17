@@ -1,5 +1,5 @@
 (ns zerohedgecl.core
-  (:require [compojure.core :refer [routes defroutes GET]]
+  (:require [compojure.core :refer [wrap-routes routes defroutes GET]]
             [ring.adapter.jetty :as ring]
 	    [hiccup.page :as page]
             [compojure.route :as route]
@@ -11,6 +11,11 @@
   (:gen-class)
 )
 
+(defn wrap-api-middleware
+  [handler]
+  (fn [req]
+    (println "API Middleware")
+    (handler req)))
 
 (defn wrap-app-middleware
   [handler]
@@ -24,17 +29,27 @@
   (route/resources "/")
   (route/not-found (layout/four-oh-four)))
 
-
+(defroutes api-routes2
+  (GET "/api" _ "API"))
 
 (defroutes api-routes
   pageCtrl/api-routes
-  (route/resources "/")
-  (route/not-found (layout/four-oh-four)))
+)
 
 (def application
   (routes
-          (-> app-routes
-              (wrap-app-middleware)))
+
+    (-> api-routes
+      (wrap-routes middleware/wrap-json-body)
+      (wrap-routes middleware/wrap-json-params)
+      (wrap-routes middleware/wrap-json-response)
+    )
+
+    (-> app-routes
+      (wrap-defaults site-defaults)
+    )
+  )
+
 )
 
 

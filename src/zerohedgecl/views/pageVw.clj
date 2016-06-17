@@ -82,8 +82,13 @@
 )
 
 (defn api-page [& [pageid]]
-  (let [ page {:body {:story {:introduction "The introduction" :reference "The refernce" :body "The body"}} }]
-    page
+  (let [
+    foundpage (count (filter #(= (compare (% :pageid) pageid) 0 ) @pages ))
+
+    all-items (get-page-items foundpage pageid)
+    response {:body {:Page pageid :Data all-items} } 
+    ] 
+    response
   )
 )
 

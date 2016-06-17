@@ -29,6 +29,7 @@
 )
 
 (defroutes api-routes
+  ;(GET "/api" _ "API")
   (GET "/api/page/:id" [id] (pageVw/api-page id))
 
 )
