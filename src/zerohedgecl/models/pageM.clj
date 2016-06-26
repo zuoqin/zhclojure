@@ -55,25 +55,26 @@
           (subs page 
             
             ( + (.indexOf page ">"
-                (+ (.indexOf page "<span title"  (+ (.indexOf page "link-created last" 0) 0 ) ) 0 )
+                (+ (.indexOf page "<span title"  (+ (.indexOf page "link-created" 0) 0 ) ) 0 )
             ) 1 )
             
             ( - (.indexOf page "</span>"
                (.indexOf page ">"
-                (+ (.indexOf page "<span title"  (+ (.indexOf page "link-created last" 0) 0 ) ) 0 )
+                (+ (.indexOf page "<span title"  (+ (.indexOf page "link-created" 0) 0 ) ) 0 )
             )
             ) 0 )
-          )
-
+          )          
           ; body
+          
           (subs page 
-            (+ (.indexOf page "<div class=\"content\">" 0) 21 )
+            (+ (.indexOf page "<div class=\"content\">" (.indexOf page "<main>" 0) ) 21 )
             (+ 
-               (if ( = (.indexOf page "<div class=\"taxonomy\">" (.indexOf page "<div class=\"content\">" 0)) -1) 
-		              (.indexOf page "<div class=\"node-full_links\">" (.indexOf page "<div class=\"content\">" 0) )
-                  (.indexOf page "<div class=\"taxonomy\">" (.indexOf page "<div class=\"content\">" 0) ) 
+               (if ( = (.indexOf page "<div class=\"taxonomy" (.indexOf page "<div class=\"content\">" (.indexOf page "<main>" 0))) -1) 
+	              (.indexOf page "<div class=\"node-links\">" (.indexOf page "<div class=\"content\">" (.indexOf page "<main>" 0)) )
+                  (.indexOf page "<div class=\"taxonomy" (.indexOf page "<div class=\"content\">" (.indexOf page "<main>" 0)) ) 
                ) 0 )
           )
+          
         )
 
         (filter #(= (compare (% :reference) reference) 0 ) @stories )

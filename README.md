@@ -11,6 +11,11 @@ user> (require 'zerohedgecl.core)
 
 user> (zerohedgecl.core/-main)
 
+### deploy locally
+
+lein compile 
+lein uberjar
+
 
 ## Test
 
