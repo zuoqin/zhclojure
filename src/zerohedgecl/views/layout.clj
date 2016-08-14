@@ -9,24 +9,28 @@
     [:meta {:name "viewport" :content
             "width=device-width, initial-scale=1, maximum-scale=1"}]
     [:title title]
-    (h/include-css "/stylesheets/bootstrap.css"
-                 "/stylesheets/bootstrap-theme.css"
+    (h/include-css "/stylesheets/bootstrap.min.css"
+                 "/stylesheets/bootstrap-theme.min.css"
                  "/stylesheets/screen.css")
     (h/include-css "/stylesheets/styles.css")]
    [:body
     [:div {:id "header"}
-     [:h1 {:class "container"} "SHOUTER"]]
+    [:h1 {:class "container"} "SHOUTER"]]
     [:div {:id "content" :class "container"} body]]))
 
 
 (defn page [& body]
   (h/html5
     [:head
-     [:title "ZeroHedge"]
-     (h/include-css "/stylesheets/screen.css")
-     (h/include-css "/stylesheets/bootstrap.css")
-     (h/include-css "/stylesheets/bootstrap-theme.css")
-     (h/include-css "/stylesheets/styles.css")]
+      [:title "ZeroHedge"]
+      (h/include-css "/stylesheets/screen.css")
+      (h/include-css "/stylesheets/bootstrap.min.css")
+      (h/include-css "/stylesheets/bootstrap-theme.min.css")
+      (h/include-css "/stylesheets/styles.css")
+ 
+      (h/include-js "/javascripts/jquery-3.1.0.min.js")
+      (h/include-js "/javascripts/bootstrap.min.js")
+    ]
     [:body body]
   )
 )
@@ -36,11 +40,15 @@
 (defn story [body title]
   (h/html5
     [:head
-     [:title title]
-     (h/include-css "/stylesheets/screen.css")
-     (h/include-css "/stylesheets/bootstrap.css")
-     (h/include-css "/stylesheets/bootstrap-theme.css")
-     (h/include-css "/stylesheets/styles.css")]
+      [:title title]
+      (h/include-css "/stylesheets/screen.css")
+      (h/include-css "/stylesheets/bootstrap.min.css")
+      (h/include-css "/stylesheets/bootstrap-theme.min.css")
+      (h/include-css "/stylesheets/styles.css")
+ 
+      (h/include-js "/javascripts/jquery-3.1.0.min.js")
+      (h/include-js "/javascripts/bootstrap.min.js")
+    ]
     [:body body]
    )
  )

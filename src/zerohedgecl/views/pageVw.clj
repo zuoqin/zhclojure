@@ -97,12 +97,20 @@
   (layout/page
 
     [:div {:role "navigation", :class "navbar navbar-inverse navbar-fixed-top"}
-      [:div {:class "navbar-collapse collapse"}
+      [:div {:class "navbar-header"}
+        [:button {:aria-controls "bs-navbar" :aria-expanded "true"
+                    :class "navbar-toggle" :data-target "#bs-navbar" :data-toggle "collapse"
+                    :type "button"}
+          [:span {:class "sr-only"} "Toggle navigation"]
+          [:span {:class "icon-bar"}]
+          [:span {:class "icon-bar"}]
+          [:span {:class "icon-bar"}]
+        ]
+        [:a {:href "/page/0" :class "navbar-brand"} "Home"]
+      ]
+      [:div {:class "navbar-collapse collapse" :id "bs-navbar"}
         [:div {:align="left"}
           [:ul {:class "nav navbar-nav"}
-            [:li
-              [:a {:href "/page/0"} "Home"]
-            ]
             [:li {:id="page1li"}
               [:a {:href "/page/1"} "Page 1"]
             ]
