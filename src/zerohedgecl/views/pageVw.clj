@@ -47,7 +47,7 @@
 
   [:div#blogItems.col-md-12 {:style "margin-top: 60px;"}
     (for [{:keys [title updated introduction reference]} all-items] 
-      [:div {:class "panel-primary"}
+      [:div {:class "panel panel-primary"}
         [:div {:class "panel-heading"}
           [:h3 {:class "panel-title"}
             [:a {:href (str "../story/" reference)}
@@ -145,7 +145,7 @@
 
 
 (defn display-story-html [title body updated]
-  [:div {:class "panel-primary"}
+  [:div {:class "panel panel-primary"}
     [:div {:class "panel-heading"}
       [:h3 {:class "panel-title"}
         title
