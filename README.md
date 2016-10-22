@@ -1,32 +1,21 @@
-# World most famous financial blog now in Clojure!
+# zhluminus
 
+generated using Luminus version "2.9.11.09"
 
-## Usage
+FIXME
 
-### run locally
+## Prerequisites
 
-lein repl
+You will need [Leiningen][1] 2.0 or above installed.
 
-user> (require 'zerohedgecl.core)
+[1]: https://github.com/technomancy/leiningen
 
-user> (zerohedgecl.core/-main)
+## Running
 
-### deploy locally
+To start a web server for the application, run:
 
-lein compile 
-lein uberjar
+    lein run
 
+## License
 
-## Test
-
-(require '[ring.mock.request :as mock])
-
-(application (mock/request :get "/api/page/1"))
-
-### deploy to [heroku](http://zhcltest.herokuapp.com/page/0)
-
-heroku create
-
-git push heroku master
-
-heroku ps
+Copyright © 2016 FIXME

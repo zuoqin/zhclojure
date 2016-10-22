@@ -1,1 +1,1 @@
-web: java $JVM_OPTS -jar target/zerohedgecl.jar
+web: java $JVM_OPTS -cp target/uberjar/zhluminus.jar clojure.main -m zhluminus.core

@@ -1,26 +1,65 @@
-(defproject zerohedgecl "0.0.2"
-  :description "Shouter app"
-  :url "https://github.com/technomancy/shouter"
-  :min-lein-version "2.0.0"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/java.jdbc "0.4.1"]
-                 [ring/ring-jetty-adapter "1.4.0"]
-                 [compojure "1.4.0"]
-                 [ring/ring-defaults "0.1.2"]
-                 [ring.middleware.conditional "0.2.0"]
-                 [ring/ring-json "0.4.0"]
-                 [org.clojure/tools.nrepl "0.2.12"]
-                 [hiccup "1.0.5"]
-                 [clj-time "0.11.0"]
-                 ]
-  :main ^:skip-aot zerohedgecl.core
-  :uberjar-name "zerohedgecl.jar"
-  :plugins [[lein-ring "0.8.13"]]
-  :ring {:handler zerohedgecl.core/application
-         }
-  :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                                  [ring-mock "0.1.5"]]}
-             :uberjar {:aot :all}})
+(defproject zhluminus "0.1.0-SNAPSHOT"
 
+  :description "FIXME: write description"
+  :url "http://example.com/FIXME"
+
+  :dependencies [[bouncer "1.0.0"]
+                 [ch.qos.logback/logback-classic "1.1.7"]
+                 [compojure "1.5.1"]
+                 [cprop "0.1.9"]
+                 [luminus-http-kit "0.1.4"]
+                 [luminus-nrepl "0.1.4"]
+                 [luminus/ring-ttl-session "0.3.1"]
+                 [markdown-clj "0.9.90"]
+                 [metosin/compojure-api "1.1.8"]
+                 [metosin/ring-http-response "0.8.0"]
+                 [mount "0.1.10"]
+                 [org.clojure/clojure "1.8.0"]
+                 [org.clojure/tools.cli "0.3.5"]
+                 [org.clojure/tools.logging "0.3.1"]
+                 [org.webjars.bower/tether "1.3.7"]
+                 [org.webjars/bootstrap "4.0.0-alpha.3"]
+                 [org.webjars/font-awesome "4.6.3"]
+                 [org.webjars/jquery "3.1.1"]
+                 [ring-middleware-format "0.7.0"]
+                 [ring-webjars "0.1.1"]
+                 [ring/ring-defaults "0.2.1"]
+                 [selmer "1.10.0"]
+                 [org.clojure/data.json "0.2.6"]
+                 [clj-http "2.3.0"]
+]
+
+  :min-lein-version "2.0.0"
+
+  :jvm-opts ["-server" "-Dconf=.lein-env"]
+  :source-paths ["src/clj"]
+  :resource-paths ["resources"]
+  :target-path "target/%s/"
+  :main zhluminus.core
+
+  :plugins [[lein-cprop "1.0.1"]]
+
+  :profiles
+  {:uberjar {:omit-source true
+             :aot :all
+             :uberjar-name "zhluminus.jar"
+             :source-paths ["env/prod/clj"]
+             :resource-paths ["env/prod/resources"]}
+
+   :dev           [:project/dev :profiles/dev]
+   :test          [:project/dev :project/test :profiles/test]
+
+   :project/dev  {:dependencies [[prone "1.1.2"]
+                                 [ring/ring-mock "0.3.0"]
+                                 [ring/ring-devel "1.5.0"]
+                                 [pjstadig/humane-test-output "0.8.1"]]
+                  :plugins      [[com.jakemccrary/lein-test-refresh "0.14.0"]]
+                  
+                  :source-paths ["env/dev/clj" "test/clj"]
+                  :resource-paths ["env/dev/resources"]
+                  :repl-options {:init-ns user}
+                  :injections [(require 'pjstadig.humane-test-output)
+                               (pjstadig.humane-test-output/activate!)]}
+   :project/test {:resource-paths ["env/dev/resources" "env/test/resources"]}
+   :profiles/dev {}
+   :profiles/test {}})
