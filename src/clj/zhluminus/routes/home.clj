@@ -8,6 +8,7 @@
             [clj-time.format :as f]
             [clojure.data.json :as json]
             [clj-http.client :as client]
+            [zhluminus.config :refer [env]]
             )
 
   (:import [java.net URLEncoder]
@@ -32,9 +33,9 @@
   "Downloading story from ZeroHedge by reference"
   [reference]
   (let [
-    
+    port (env :port)
     story (if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0)
-        (first (json/read-str (:body (client/get (str "http://127.0.0.1/api/story?url=" reference) {:accept :json})   )  )  )  
+        (first (json/read-str (:body (client/get (str "http://127.0.0.1:" port "/api/story?url=" reference) {:accept :json})   )  )  )  
         ;(json/read-str (slurp (str "http://127.0.0.1/api/story?url=" reference) ) ) 
         
     )
@@ -122,7 +123,7 @@
 
 (defn loadPage [pageid]
   (let [
-
+    port (env :port)
     id(
       if( .startsWith (.getName (.getClass  pageid)) "java.lang.String")
         (Integer. pageid)
@@ -138,7 +139,7 @@
                    
                    
                    )  
-              (json/read-str (slurp (str "http://127.0.0.1/api/stories?page=" pageid) ) )
+              (json/read-str (slurp (str "http://127.0.0.1:" port "/api/stories?page=" pageid) ) )
  ) 
 
         ]
