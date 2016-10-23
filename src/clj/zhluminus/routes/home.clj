@@ -34,8 +34,8 @@
   (let [
     
     story (if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0)
-        (first (json/read-str (:body (client/get (str "http://127.0.0.1:3000/api/story?url=" reference) {:accept :json})   )  )  )  
-        ;(json/read-str (slurp (str "http://127.0.0.1:3000/api/story?url=" reference) ) ) 
+        (first (json/read-str (:body (client/get (str "http://127.0.0.1/api/story?url=" reference) {:accept :json})   )  )  )  
+        ;(json/read-str (slurp (str "http://127.0.0.1/api/story?url=" reference) ) ) 
         
     )
     listofintro
@@ -46,8 +46,8 @@
       )
     
     ]
-    (println "count =" (count (filter #(= (compare (% :reference) reference) 0 ) @stories ))  )
-    (println listofintro )
+    ;;(println "count =" (count (filter #(= (compare (% :reference) reference) 0 ) @stories ))  )
+    ;;(println listofintro )
     (
       if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0) 
         (swap! stories conj 
@@ -138,7 +138,7 @@
                    
                    
                    )  
-              (json/read-str (slurp (str "http://127.0.0.1:3000/api/stories?page=" pageid) ) )
+              (json/read-str (slurp (str "http://127.0.0.1/api/stories?page=" pageid) ) )
  ) 
 
         ]
@@ -191,8 +191,8 @@
 
 (defn story-page [reference]
   (let [story  (download-story reference)              ]
-    (println "reference=" reference)
-    (println story)
+    ;;(println "reference=" reference)
+    ;;(println story)
     (layout/render
         "story.html" {:story  story   }     ;
       )

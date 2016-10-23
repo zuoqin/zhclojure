@@ -92,7 +92,7 @@
         )
       
     )
-    (println reference)
+    ;;(println reference)
     listofintro
     
     )
@@ -182,7 +182,7 @@
      (swap! pages #(remove (fn [page] (= (:pageid page) num)) %)))
 
 (defn download-zerohedge-byid [id]
-  ;(println id)
+  (println "downloading page from zerohedge")
   (slurp (str "http://www.zerohedge.com/?page=" id))
 )
 
@@ -203,6 +203,7 @@
       )
     )
     (download-zerohedge-byid id)
+    (println "no need to refresh cache")
   )
 )
 
@@ -245,9 +246,8 @@
     ]
 
     (if-let [
-      page (check-page-cache-need-refresh id)
-        ]
-
+      page (check-page-cache-need-refresh id)      
+        ]        
 
         (if-let [outarr 
                     (parse-zerohedge-page page id)
@@ -257,6 +257,8 @@
         
     )
   )
+
+  ;(println "from loadPage")
 )
 
 
@@ -272,10 +274,12 @@
 
 
 (defn get-page-items [found pageid]
-  (if (< found 1)
-    (loadandsetpage pageid) ;(pageM/loadPage pageid)
-    (filter #(= (compare (% :pageid) pageid) 0 ) @pages )
-  )
+  ;; (if (< found 1)
+  ;;   (loadandsetpage pageid) ;(pageM/loadPage pageid)
+  ;;   (filter #(= (compare (% :pageid) pageid) 0 ) @pages )
+  ;; )
+
+  (loadandsetpage pageid)
 )
 
 (defn get-items [pageid]
