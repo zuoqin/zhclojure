@@ -17,17 +17,9 @@
 
 )
 
-
-
-(def pages (atom []))
-
 (def stories (atom []))
 
-(defn pagelifetime [] 2)
-
 (defn now [] (new java.util.Date))
-
-
 
 (defn download-story
   "Downloading story from ZeroHedge by reference"
@@ -62,64 +54,6 @@
 )
 
 
-(defn delete-page-by-number [num]
-     (swap! pages #(remove (fn [page] (= (:pageid page) num)) %)))
-
-
-(defn download-zerohedge-byid [id]
-  ;(println id)
-  (slurp (str "http://www.zerohedge.com/?page=" id))
-)
-
-(defn check-page-cache-need-refresh [id]
-  (if(
-    or
-      (< (count (filter #(= (compare (% :pageid) id) 0 ) @pages )) 1)
-      (
-        >
-        (t/in-minutes 
-          (t/interval 
-            (f/parse  (f/formatters :date-hour-minute-second-ms) (.format (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS") (:downloaded (first (filter #(= (compare (% :pageid) id) 0 ) @pages ) ))))
-            (f/parse  (f/formatters :date-hour-minute-second-ms) (.format (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSS") (now)) )    
-            
-          )
-        )
-        (pagelifetime)
-      )
-    )
-    ;(download-zerohedge-byid id)
-    true
-    false
-  )
-)
-
-(defn refresh-page-cache [id array]
-
-  (delete-page-by-number id)
-
-  (doseq [x array] 
-
-     (swap! pages conj 
-        {:pageid id :downloaded (now) :updated (:updated x) :introduction (:introduction x) :title (:title x) :reference (:reference x) }
-     )
-  )
-)
-
-;; (defn parse-zerohedge-page [id]
-;;   (    
-;;     let [ 
-;;     mainContent (nth (str/split page #"<div class=\"view-content\">") 1) 
-;;     contentItems (str/split mainContent #"views-row views-row-")
-;;     contentItemsCount (count contentItems)
-;;     items (take-last (- contentItemsCount 1) contentItems)
-;;     outarr (map get-introduction items)
-;;     ]
-;;     ;(println mainContent)
-;;     (refresh-page-cache id outarr)
-;;     outarr
-;;   )
-;; )
-
 
 (defn loadPage [pageid]
   (let [
@@ -143,52 +77,100 @@
  ) 
 
         ]
-    ;(refresh-page-cache pageid stories)
+    stories
+  )
+)
+
+(defn loadSearchPage [search pageid]
+  (let [
+    port (env :port)
+    id(
+      if( .startsWith (.getName (.getClass  pageid)) "java.lang.String")
+        (Integer. pageid)
+        pageid
+    )
+    url (str "http://127.0.0.1:" port "/api/search?srchtext=" search "&page=" pageid)
+    fullpage (slurp url )  
+    ;res (println fullpage)
+
+    stories (if (= (str/index-of fullpage "Your search yielded no results") nil)  
+              (map (fn [x] {
+                                         :introduction (get x "introduction")
+                                         :updated (get x "updated")
+                                         :title (get x "title")
+                                         :reference (get x "reference")
+                                         }
+                   
+                   
+                           )  
+                    (json/read-str fullpage )
+                    )
+              [{:introduction "<p>Your search yielded no results</p>" :updated "2016-01-01" :title "Search results" :reference ""}]
+ )  
+        ]
     stories
   )
 )
 
 
 
-
-
+(defn loadandsetsearchpage [search pageid]
+  (
+    let
+      [
+        page (loadSearchPage search pageid)
+      ]
+      page
+  )
+)
 
 (defn loadandsetpage [pageid]
   (
     let
       [
         page (loadPage pageid)
-
       ]
       page
   )
 )
 
-(defn get-page-items [found pageid]
-  (if (< found 1)
-    (loadandsetpage pageid) ;(pageM/loadPage pageid)
-    (filter #(= (compare (% :pageid) pageid) 0 ) @pages )
-  )
+(defn get-page-items [pageid]
+  (loadandsetpage pageid)
 )
 
+(defn get-search-page-items [search pageid]
+  (loadandsetsearchpage search pageid)
+)
 
 (defn show-items [pageid]
   (let [
-    foundpage (count (filter #(= (compare (% :pageid) pageid) 0 ) @pages ))
-
-    all-items (get-page-items foundpage pageid)
-
+    all-items (get-page-items pageid)
     ] 
     all-items
   )
 )
 
+(defn show-search-items [search pageid]
+  (let [
+    all-items (get-search-page-items search pageid)
+    ] 
+    all-items
+  )
+)
 
 (defn stories-page [pageid]
   (layout/render
     "stories.html" {:stories (show-items pageid)}
   )
 )
+
+(defn search-stories-page [key pageid]
+  (println "key=" key)
+  (layout/render
+    "search.html" {:stories (show-search-items key pageid) :search key :page pageid}
+  )
+)
+
 
 (defn story-page [reference]
   (let [story  (download-story reference)              ]
@@ -198,7 +180,6 @@
         "story.html" {:story  story   }     ;
       )
   )
-  
 )
 
 
@@ -206,4 +187,6 @@
   (GET "/" [] (stories-page 0))
   (GET "/page/:id" [id] (stories-page id))
   (GET "/story/:reference" [reference] (story-page reference))
+  (GET "/search/:key/:page" [key page] (search-stories-page key page))
+  (GET "/search*" {params :query-params} (search-stories-page (get params "srchtext")  (if (= (get params "page") nil) 0 (get params "page")) ))
 )

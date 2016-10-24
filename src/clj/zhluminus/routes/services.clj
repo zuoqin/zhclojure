@@ -3,6 +3,7 @@
             [compojure.api.sweet :refer :all]
             [schema.core :as s]
             [zhluminus.routes.stories :as stories]
+            [zhluminus.routes.search :as search]
   )
 )
 
@@ -26,6 +27,10 @@
       :summary      "One story data."
       (ok (stories/download-story url)))
 
+    (GET "/search" []
+      :query-params [srchtext :- String {page :- Long 0}]
+      :summary      "Search web site for stories"
+      (ok (search/get-items srchtext page)))
     ;; (GET "/plus" []
     ;;   :return       Long
     ;;   :query-params [x :- Long, {y :- Long 1}]

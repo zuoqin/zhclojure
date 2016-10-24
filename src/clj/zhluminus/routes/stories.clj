@@ -3,7 +3,7 @@
             [clojure.string :as str]
             [clj-time.core :as t]
             [clj-time.format :as f]
-
+            [clj-http.client :as client]
             )
 
   (:import [java.net URLEncoder]
@@ -37,11 +37,15 @@
   [reference]
   (let [
     
+    url (str "http://zerohedge.com" (URLDecoder/decode (URLDecoder/decode  reference "UTF-8") "UTF-8")   )
+
+    ;url2 (println "url=" url)
     page (
       if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0)
-        (slurp (str "http://zerohedge.com" (URLDecoder/decode  reference)) )
+        (:body (client/get url ) ) 
         
     )
+    page1 (println page)
     listofintro
       (if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0) 
         (createStoryMessage 
@@ -182,7 +186,7 @@
      (swap! pages #(remove (fn [page] (= (:pageid page) num)) %)))
 
 (defn download-zerohedge-byid [id]
-  (println "downloading page from zerohedge")
+  ;(println "downloading page from zerohedge")
   (slurp (str "http://www.zerohedge.com/?page=" id))
 )
 
@@ -203,7 +207,7 @@
       )
     )
     (download-zerohedge-byid id)
-    (println "no need to refresh cache")
+    ;(println "no need to refresh cache")
   )
 )
 
