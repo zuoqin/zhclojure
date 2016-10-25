@@ -22,25 +22,25 @@
               &#9776;
           </button>
           <div class="collapse navbar-toggleable-xs" id="collapsing-navbar">
-              <a class="navbar-brand" href="{{servlet-context}}/">Home</a>
+            <a class="navbar-brand" href="{{servlet-context}}/" style="color:rgba(255,255,255,0.5)">Home</a>
               <ul class="nav navbar-nav">
                   <li class="nav-item">
                       <a href="{{servlet-context}}/search?srchtext={{search}}&page=0"
-                         class="nav-link{% ifequal page "about.html" %} active{%endifequal%}">
+                         class="nav-link{% ifequal pageid 0 %} active{%endifequal%}">
                       Page 1
                       </a>
                   </li>
 
                   <li class="nav-item">
                       <a href="{{servlet-context}}/search?srchtext={{search}}&page=1"
-                         class="nav-link{% ifequal page "about.html" %} active{%endifequal%}">
+                         class="nav-link{% ifequal pageid 1 %} active{%endifequal%}">
                       Page 2
                       </a>
                   </li>
 
                   <li class="nav-item">
                       <a href="{{servlet-context}}/search?srchtext={{search}}&page=2"
-                         class="nav-link{% ifequal page "about.html" %} active{%endifequal%}">
+                         class="nav-link{% ifequal pageid 2 %} active{%endifequal%}">
                       Page 3
                       </a>
                   </li>
@@ -48,7 +48,7 @@
 
                   <li class="nav-item">
                       <a href="{{servlet-context}}/search?srchtext={{search}}&page=3"
-                         class="nav-link{% ifequal page "about.html" %} active{%endifequal%}">
+                         class="nav-link{% ifequal pageid 3 %} active{%endifequal%}">
                       Page 4
                       </a>
                   </li>                  

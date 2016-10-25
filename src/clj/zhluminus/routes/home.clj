@@ -160,14 +160,14 @@
 
 (defn stories-page [pageid]
   (layout/render
-    "stories.html" {:stories (show-items pageid)}
+    "stories.html" {:stories (show-items pageid) :pageid pageid}
   )
 )
 
 (defn search-stories-page [key pageid]
   (println "key=" key)
   (layout/render
-    "search.html" {:stories (show-search-items key pageid) :search key :page pageid}
+    "search.html" {:stories (show-search-items key pageid) :search key :pageid pageid}
   )
 )
 
