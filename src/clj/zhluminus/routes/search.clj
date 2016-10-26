@@ -16,8 +16,6 @@
 
 (def pages (atom []))
 
-(def stories (atom []))
-
 (defn pagelifetime [] 2)
 
 (defn now [] (new java.util.Date))
@@ -105,7 +103,7 @@
 )
 
 (defn delete-page-by-number [search id]
-     (swap! pages #(remove (fn [page] (and  (= (:pageid page) id) (= (:search page) search)  ) %)))
+  (swap! pages #(remove (fn [page] (and  (= (:pageid page) id) (= (:search page) search)  )) % ))
 )
 
 
@@ -147,14 +145,23 @@
 (defn refresh-page-cache [search id array]
 
   (delete-page-by-number search id)
+  ;(println (nth array 0))
+     ;; (swap! pages conj 
+     ;;    { :pageid id :downloaded (now) :search search :updated (:updated (nth array 0)) 
+     ;;      :introduction (:introduction x) :title (:title x) :reference (:reference x) 
+     ;;     }
+     ;; )
 
   (doseq [x array] 
-
+     ;(println "updated = " (:updated x))
      (swap! pages conj 
         { :pageid id :downloaded (now) :search search :updated (:updated x) 
-          :introduction (:introduction x) :title (:title x) :reference (:reference x) }
+          :introduction (:introduction x) :title (:title x) :reference (:reference x) 
+         }
      )
   )
+
+  ;(println "count pages=" (count @pages))
 )
 
 (defn parse-zerohedge-page [page search id]
@@ -168,7 +175,7 @@
     outarr (map parse-srch-itemrow items)
     ]
     ;(println mainContent)
-    ;(refresh-page-cache search id outarr)
+    (refresh-page-cache search id outarr)
     outarr
     ;contentItemsCount
   )
@@ -213,15 +220,15 @@
 )
 
 
-(defn get-page-items [found search pageid]
+(defn get-page-items [search pageid]
   (loadandsetpage search pageid)
 )
 
 (defn get-items [search pageid]
   (let [
-    foundpage (count (filter #( and (= (compare (% :pageid) pageid) 0) (= (compare (% :search) search) 0)) @pages ))
+    ;foundpage 0;(count (filter #( and (= (compare (% :pageid) pageid) 0) (= (compare (% :search) search) 0)) @pages ))
 
-    all-items (get-page-items foundpage search pageid)
+    all-items (get-page-items search pageid)
 
     ] 
 

@@ -165,7 +165,7 @@
 )
 
 (defn search-stories-page [key pageid]
-  (println "key=" key)
+  ;(println "key=" key)
   (layout/render
     "search.html" {:stories (show-search-items key pageid) :search key :pageid pageid}
   )
