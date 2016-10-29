@@ -21,9 +21,32 @@
 
 (defn now [] (new java.util.Date))
 
+
+(defn replaceLinks [body root]
+  (let[
+          list1 [ "http://www.zerohedge.com/news/" "http://www.zerohedge.com/article/" ]
+          newbody1 (str/replace body (nth list1 0) (str root "/story/news/") )
+          newbody2 (str/replace newbody1 (nth list1 1) (str root "/story/news/" ) )
+  ]
+  ;(println root)
+  newbody2
+  )
+)
+
+(defn replaceLinksBack [body]
+  (let[
+          list1 [ "\"/sites/default\"" ]
+          newbody1 (str/replace body (nth list1 0) "http://www.zerohedge.com/sites/default")
+  ]
+  newbody1
+  )
+)
+
+
+
 (defn download-story
   "Downloading story from ZeroHedge by reference"
-  [reference]
+  [reference root]
   (let [
     port (env :port)
     story (if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0)
@@ -34,7 +57,7 @@
     listofintro
       (if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0) 
         
-        {:body (get story "body" ) :title (get story "title" ) :updated (get story "updated" )} 
+        {:body (replaceLinksBack(replaceLinks (get story "body" ) root))  :title (get story "title" ) :updated (get story "updated" )} 
         (first (filter #(= (compare (% :reference) reference) 0 ) @stories )) 
       )
     
@@ -172,9 +195,10 @@
 )
 
 
-(defn story-page [reference]
-  (let [story  (download-story reference)              ]
-    ;;(println "reference=" reference)
+(defn story-page [reference root]
+  (let [story  (download-story reference root)
+        ]
+    ;(println "reference=" reference)
     ;;(println story)
     (layout/render
         "story.html" {:story  story   }     ;
@@ -183,10 +207,20 @@
 )
 
 
+(defn testreq [request]
+  (println request)
+)
+
 (defroutes stories-routes
   (GET "/" [] (stories-page 0))
   (GET "/page/:id" [id] (stories-page id))
-  (GET "/story/:reference" [reference] (story-page reference))
+  ;(GET "/story/:reference" [reference] (story-page reference))
+  (GET "/story*" params (story-page (URLEncoder/encode (str "" (subs (:uri params)  (+ (.indexOf (:uri params) "/story/") 6 )  )    ))  (str (:schema params) "//" (:server-name params) (if (= (:server-port params) 80) "" (str ":" (:server-port params) )  )   
+
+
+
+)))
   (GET "/search/:key/:page" [key page] (search-stories-page key page))
   (GET "/search*" {params :query-params} (search-stories-page (get params "srchtext")  (if (= (get params "page") nil) 0 (get params "page")) ))
+  (GET "/test*" params (testreq params))  
 )

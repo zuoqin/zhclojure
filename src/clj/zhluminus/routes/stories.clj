@@ -22,15 +22,13 @@
 
 (defn now [] (new java.util.Date))
 
-(defn all []
-  [{:name "First" :action "About"} {:name "Second" :action "Help"}]
-)
+
 
 (defn createStoryMessage [title updated body]
-  (let []
-    [{ :title title :updated updated :body body }]
-  )
+  [{ :title title :updated updated :body body }]
+  
 )
+
 
 (defn download-story
   "Downloading story from ZeroHedge by reference"
@@ -45,7 +43,6 @@
         (:body (client/get url ) ) 
         
     )
-    page1 (println page)
     listofintro
       (if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0) 
         (createStoryMessage 
