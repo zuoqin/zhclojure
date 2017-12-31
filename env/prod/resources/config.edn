@@ -1,2 +1,7 @@
 {:production true
- :port 80}
+ :port 10555
+
+ :ssl {:port              443
+ :keystore          "/home/ubuntu/cacerts"
+ :keystore-password "Qwerty123"}
+ }

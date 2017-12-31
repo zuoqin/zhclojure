@@ -3,7 +3,7 @@
             [clojure.string :as str]
             [clj-time.core :as t]
             [clj-time.format :as f]
-            [clj-http.client :as client]
+
             )
 
   (:import [java.net URLEncoder]
@@ -22,25 +22,24 @@
 
 (defn now [] (new java.util.Date))
 
-
-
-(defn createStoryMessage [title updated body]
-  [{ :title title :updated updated :body body }]
-  
+(defn all []
+  [{:name "First" :action "About"} {:name "Second" :action "Help"}]
 )
 
+(defn createStoryMessage [title updated body]
+  (let []
+    [{ :title title :updated updated :body body }]
+  )
+)
 
 (defn download-story
   "Downloading story from ZeroHedge by reference"
   [reference]
   (let [
     
-    url (str "http://zerohedge.com" (URLDecoder/decode (URLDecoder/decode  reference "UTF-8") "UTF-8")   )
-
-    ;url2 (println "url=" url)
     page (
       if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0)
-        (:body (client/get url ) ) 
+        (slurp (str "https://zerohedge.com" (URLDecoder/decode  reference)) )
         
     )
     listofintro
@@ -57,25 +56,21 @@
           (subs page 
             
             ( + (.indexOf page ">"
-                (+ (.indexOf page "<span title"  (+ (.indexOf page "link-created" 0) 0 ) ) 0 )
+                (+ (.indexOf page "span property=\"schema:dateCreated\""  (+ (.indexOf page "submitted-datetime" 0) 0 ) ) 0 )
             ) 1 )
             
             ( - (.indexOf page "</span>"
-               (.indexOf page ">"
-                (+ (.indexOf page "<span title"  (+ (.indexOf page "link-created" 0) 0 ) ) 0 )
-            )
+              (+ (.indexOf page "span property=\"schema:dateCreated\""  (+ (.indexOf page "submitted-datetime" 0) 0 ) ) 0 )
+            
             ) 0 )
           )          
           ; body
           
-          (subs page 
-            (+ (.indexOf page "<div class=\"content\">" (.indexOf page "<main>" 0) ) 21 )
-            (+ 
-               (if ( = (.indexOf page "<div class=\"taxonomy" (.indexOf page "<div class=\"content\">" (.indexOf page "<main>" 0))) -1) 
-                (.indexOf page "<div class=\"node-links\">" (.indexOf page "<div class=\"content\">" (.indexOf page "<main>" 0)) )
-                  (.indexOf page "<div class=\"taxonomy" (.indexOf page "<div class=\"content\">" (.indexOf page "<main>" 0)) ) 
-               ) 0 )
-          )
+          (str/replace (subs page 
+                   (+ (.indexOf page ">" (.indexOf page "div property=\"schema:text\"" (.indexOf page "node__content" 0) ))1)
+
+                   (- (.indexOf page "<div class=\"extras-section\">" (.indexOf page "node__content" 0))1)
+                   ) #"src=\"/sites" "src=\"https://zerohedge.com/sites") 
           
         )
 
@@ -93,7 +88,7 @@
         )
       
     )
-    ;;(println reference)
+    ;(println reference)
     listofintro
     
     )
@@ -108,58 +103,98 @@
 
 
 (defn get-introduction [source]
-   ( let [
-       reference (str 
-            (URLEncoder/encode (str ""
-              (subs source 
+  (let [
+    ;tr1 (println (take 300 source))
+    teasertitleind (.indexOf source "teaser-title" 0)
+    ;tr1 (println (str "teaserind=" teasertitleind))
+    reference 
+      (str 
+        (URLEncoder/encode
+          (str ""
+            (subs source 
                 (+
                   (.indexOf source "href=\""
-                        (+ (.indexOf source "<h2 class=\"title teaser-title\">" 0) 20 )
+                        (+ teasertitleind 15 )
                   )
                   6
                 )
+                (- 
+                  (.indexOf source " rel"
+                    (.indexOf source "href=\""
+                          (+ teasertitleind 15 )
+                    )
+                  ) 
+                1)
 
-                (.indexOf source "\">"
-                  (.indexOf source "href=\""
-                        (+ (.indexOf source "<h2 class=\"title teaser-title\">" 0) 20 )
-                  )
-                )
               )            
-            ) 
-              "UTF-8"
+            )
+            "UTF-8"
+          )
+       )
+
+
+    title
+      (subs source 
+        (+ (.indexOf source ">"
+            (+ (.indexOf source "<span property=\"schema:name\""
+              (+ teasertitleind 15)
+              )
+              0
             )
           )
-       title (subs source 
-          (+
+          1
+        )
+
+        (-
+          (.indexOf source "</span"
+            (+ (.indexOf source "<span property=\"schema:name\""  (+ teasertitleind 15 ))
+              0
+            )
+          )
+          0
+        )
+      )
+
+    introduction (subs source 
+          (+ 
             (.indexOf source ">"
-                  (+ (.indexOf source "<h2 class=\"title teaser-title\">" 0) 32 )
+              (.indexOf source "div property=\"schema:text\"" 
+                (+ (.indexOf source "<span class=\"teaser-text\">" 0) 10)
+              )
+            )
+            1
+          )
+          
+          (-
+            (.indexOf source "</div>"
+              (.indexOf source "div property=\"schema:text\"" 
+                (+ (.indexOf source "<span class=\"teaser-text\">" 0) 10)
+              )
             )
             1
           )
 
-          (.indexOf source "</a>"
-                (+ (.indexOf source "<h2 class=\"title teaser-title\">" 0) 32)
-          ) 
        )
-       introduction (subs source 
-          (+ (.indexOf source "<span class=\"teaser-text\">" 0) 0 )
-          
-          (+
-            (.indexOf source "</section>"
-                  (+ (.indexOf source "<span class=\"teaser-text\">" 0) 0)
-            ) 0
-          )
-       )
+
        updated (subs source
-            
-            ( + (.indexOf  source  ">"
-                (+ (.indexOf source "<span title"  (+ (.indexOf source "link-created" 0) 0 ) ) 0 )
-            ) 1 )
-            
-            ( - (.indexOf source "</span>"
-               (+ (.indexOf source "<span title"  (+ (.indexOf source "link-created" 0) 0 ) ) 0 )
-            ) 0 )
-          )   
+          (+ 
+            (.indexOf source "<span>"
+              (.indexOf source "extras__created" 
+                (+ (.indexOf source "<footer class=\"teaser-details\">" 0) 10)
+              )
+            )
+            6
+          )
+
+          (+ 
+            (.indexOf source "</span>"
+              (.indexOf source "extras__created" 
+                (+ (.indexOf source "<footer class=\"teaser-details\">" 0) 10)
+              )
+            )
+            0
+          )
+        )   
     ]
     ;(println "==================")
     ;(println updated)
@@ -183,8 +218,8 @@
      (swap! pages #(remove (fn [page] (= (:pageid page) num)) %)))
 
 (defn download-zerohedge-byid [id]
-  ;(println "downloading page from zerohedge")
-  (slurp (str "http://www.zerohedge.com/?page=" id))
+  ;(println id)
+  (slurp (str "https://www.zerohedge.com/articles?page=" id))
 )
 
 (defn check-page-cache-need-refresh [id]
@@ -204,7 +239,6 @@
       )
     )
     (download-zerohedge-byid id)
-    ;(println "no need to refresh cache")
   )
 )
 
@@ -223,11 +257,29 @@
 (defn parse-zerohedge-page [page id]
   (    
     let [ 
-    mainContent (nth (str/split page #"<div class=\"view-content\">") 1) 
-    contentItems (str/split mainContent #"views-row views-row-")
-    contentItemsCount (count contentItems)
-    items (take-last (- contentItemsCount 1) contentItems)
-    outarr (map get-introduction items)
+    mainContent (nth (str/split page #"view view-articles view-id-articles view-display-id-page") 1) 
+    mainContent (subs mainContent (.indexOf mainContent "<div class=\"views-row\">" 0))
+
+    outarr 
+      (loop [result [] content mainContent]
+        (if (>= (.indexOf content "<div class=\"views-row\">") 0)
+          (let [
+            endofarticle (.indexOf content "<div class=\"views-row\">" (+ (.indexOf content "<div class=\"views-row\">") 10))
+            endofarticle (if (> endofarticle 0) endofarticle (.indexOf content "<nav class=\"pager\""))
+
+            source (subs content (+ (.indexOf content "<div class=\"views-row\">" 0) 10))
+
+            ;tr1 (println (str "end of paragraph=" endofarticle))
+            ]
+            (recur (conj result (get-introduction source)) (subs content endofarticle))
+          )
+          result
+        )
+      )
+    ;contentItems (str/split mainContent #"views-row")
+    ;contentItemsCount (count contentItems)
+    ;items (take-last (- contentItemsCount 1) contentItems)
+    ;outarr (map get-introduction items)
     ]
     ;(println mainContent)
     (refresh-page-cache id outarr)
@@ -247,8 +299,9 @@
     ]
 
     (if-let [
-      page (check-page-cache-need-refresh id)      
-        ]        
+      page (check-page-cache-need-refresh id)
+        ]
+
 
         (if-let [outarr 
                     (parse-zerohedge-page page id)
@@ -258,8 +311,6 @@
         
     )
   )
-
-  ;(println "from loadPage")
 )
 
 
@@ -275,12 +326,10 @@
 
 
 (defn get-page-items [found pageid]
-  ;; (if (< found 1)
-  ;;   (loadandsetpage pageid) ;(pageM/loadPage pageid)
-  ;;   (filter #(= (compare (% :pageid) pageid) 0 ) @pages )
-  ;; )
-
-  (loadandsetpage pageid)
+  (if (< found 1)
+    (loadandsetpage pageid) ;(pageM/loadPage pageid)
+    (filter #(= (compare (% :pageid) pageid) 0 ) @pages )
+  )
 )
 
 (defn get-items [pageid]

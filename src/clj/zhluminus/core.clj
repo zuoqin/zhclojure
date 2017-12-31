@@ -5,8 +5,21 @@
             [zhluminus.config :refer [env]]
             [clojure.tools.cli :refer [parse-opts]]
             [clojure.tools.logging :as log]
+            [clojure.java.io :as io]
             [mount.core :as mount])
+  (:import 
+   (java.security KeyStore)
+   (java.util.TimeZone)
+   (org.joda.time DateTimeZone)
+  )    
   (:gen-class))
+
+
+; (defn keystore [file pass]
+;   (doto (KeyStore/getInstance "JKS")
+;     (.load (io/input-stream (io/file file)) (.toCharArray pass))
+;   )
+; )
 
 (def cli-options
   [["-p" "--port PORT" "Port number"
@@ -15,12 +28,25 @@
 (mount/defstate ^{:on-reload :noop}
                 http-server
                 :start
-                (http/start
-                  (-> env
-                      (assoc :handler (handler/app))
-                      (update :port #(or (-> env :options :port) %))))
+                (let [ssl-options (:ssl env)]
+                  (http/start
+                    (merge
+                       env
+                       {:handler (handler/app)}
+                       ; (if ssl-options
+                       ;   {
+                       ;    ;:port nil ;disables access on HTTP port
+                       ;    :ssl-port (:port ssl-options)
+                       ;    :keystore     (keystore (:keystore ssl-options) (:keystore-password ssl-options))
+                       ;    :key-password (:keystore-password ssl-options)
+                       ;   }
+                       ; )
+                    )
+                  )
+                )
                 :stop
                 (http/stop http-server))
+
 
 (mount/defstate ^{:on-reload :noop}
                 repl-server
