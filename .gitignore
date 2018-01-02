@@ -10,4 +10,3 @@ profiles.clj
 /.env
 .nrepl-port
 /log
-env/test/resources/logback.xml

@@ -3,12 +3,10 @@
             zhluminus.core))
 
 (defn start []
-  (mount/start-without #'zhluminus.core/http-server
-                       #'zhluminus.core/repl-server))
+  (mount/start-without #'zhluminus.core/repl-server))
 
 (defn stop []
-  (mount/stop-except #'zhluminus.core/http-server
-                     #'zhluminus.core/repl-server))
+  (mount/stop-except #'zhluminus.core/repl-server))
 
 (defn restart []
   (stop)

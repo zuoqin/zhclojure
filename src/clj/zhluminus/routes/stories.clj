@@ -3,7 +3,7 @@
             [clojure.string :as str]
             [clj-time.core :as t]
             [clj-time.format :as f]
-
+            [clj-http.client :as client]
             )
 
   (:import [java.net URLEncoder]
@@ -22,24 +22,25 @@
 
 (defn now [] (new java.util.Date))
 
-(defn all []
-  [{:name "First" :action "About"} {:name "Second" :action "Help"}]
-)
+
 
 (defn createStoryMessage [title updated body]
-  (let []
-    [{ :title title :updated updated :body body }]
-  )
+  [{ :title title :updated updated :body body }]
+  
 )
+
 
 (defn download-story
   "Downloading story from ZeroHedge by reference"
   [reference]
   (let [
     
+    url (str "https://zerohedge.com" (URLDecoder/decode (URLDecoder/decode  reference "UTF-8") "UTF-8")   )
+
+    ;url2 (println "url=" url)
     page (
       if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0)
-        (slurp (str "https://zerohedge.com" (URLDecoder/decode  reference)) )
+        (:body (client/get url ) ) 
         
     )
     listofintro
@@ -60,17 +61,16 @@
             ) 1 )
             
             ( - (.indexOf page "</span>"
-              (+ (.indexOf page "span property=\"schema:dateCreated\""  (+ (.indexOf page "submitted-datetime" 0) 0 ) ) 0 )
-            
+               (+ (.indexOf page "span property=\"schema:dateCreated\""  (+ (.indexOf page "submitted-datetime" 0) 0 ) ) 0 )
             ) 0 )
           )          
           ; body
           
           (str/replace (subs page 
-                   (+ (.indexOf page ">" (.indexOf page "div property=\"schema:text\"" (.indexOf page "node__content" 0) ))1)
-
-                   (- (.indexOf page "<div class=\"extras-section\">" (.indexOf page "node__content" 0))1)
-                   ) #"src=\"/sites" "src=\"https://zerohedge.com/sites") 
+                    (+ (.indexOf page ">" (.indexOf page "div property=\"schema:text\"" (.indexOf page "node__content" 0) ))1)
+ 
+                    (- (.indexOf page "<div class=\"extras-section\">" (.indexOf page "node__content" 0))1)
+                    ) #"src=\"/sites" "src=\"https://zerohedge.com/sites")
           
         )
 
@@ -88,7 +88,7 @@
         )
       
     )
-    ;(println reference)
+    ;;(println reference)
     listofintro
     
     )
@@ -218,7 +218,7 @@
      (swap! pages #(remove (fn [page] (= (:pageid page) num)) %)))
 
 (defn download-zerohedge-byid [id]
-  ;(println id)
+  ;(println "downloading page from zerohedge")
   (slurp (str "https://www.zerohedge.com/articles?page=" id))
 )
 
@@ -239,6 +239,7 @@
       )
     )
     (download-zerohedge-byid id)
+    ;(println "no need to refresh cache")
   )
 )
 
@@ -276,12 +277,7 @@
           result
         )
       )
-    ;contentItems (str/split mainContent #"views-row")
-    ;contentItemsCount (count contentItems)
-    ;items (take-last (- contentItemsCount 1) contentItems)
-    ;outarr (map get-introduction items)
     ]
-    ;(println mainContent)
     (refresh-page-cache id outarr)
     outarr
   )
@@ -299,9 +295,8 @@
     ]
 
     (if-let [
-      page (check-page-cache-need-refresh id)
-        ]
-
+      page (check-page-cache-need-refresh id)      
+        ]        
 
         (if-let [outarr 
                     (parse-zerohedge-page page id)
@@ -311,6 +306,8 @@
         
     )
   )
+
+  ;(println "from loadPage")
 )
 
 
@@ -326,10 +323,12 @@
 
 
 (defn get-page-items [found pageid]
-  (if (< found 1)
-    (loadandsetpage pageid) ;(pageM/loadPage pageid)
-    (filter #(= (compare (% :pageid) pageid) 0 ) @pages )
-  )
+  ;; (if (< found 1)
+  ;;   (loadandsetpage pageid) ;(pageM/loadPage pageid)
+  ;;   (filter #(= (compare (% :pageid) pageid) 0 ) @pages )
+  ;; )
+
+  (loadandsetpage pageid)
 )
 
 (defn get-items [pageid]

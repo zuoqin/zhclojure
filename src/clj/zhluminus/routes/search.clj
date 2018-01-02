@@ -35,14 +35,14 @@
               (subs source 
                 (+
                   (.indexOf source "href=\""
-                        (+ (.indexOf source "<dt class=\"title\">" 0) 0 )
+                        (+ (.indexOf source "<h3 class=\"search-result__title\">" 0) 0 )
                   )
                   6
                 )
 
                 (.indexOf source "\">"
                   (.indexOf source "href=\""
-                        (+ (.indexOf source "<dt class=\"title\">" 0) 0 )
+                        (+ (.indexOf source "<h3 class=\"search-result__title\">" 0) 0 )
                   )
                 )
               )            
@@ -54,35 +54,35 @@
        title (subs source 
           (+
             (.indexOf source ">"
-                  (+ (.indexOf source "<dt class=\"title\">" 0) 20 )
+                  (+ (.indexOf source "<h3 class=\"search-result__title\">" 0) 35 )
             )
             1
           )
 
           (.indexOf source "</a>"
-                (+ (.indexOf source "<dt class=\"title\">" 0) 20)
+                (+ (.indexOf source "<h3 class=\"search-result__title\">" 0) 35)
           ) 
        )
        introduction (subs source 
-          (+ (.indexOf source "<dd>" 0) 0 )
+          (+ (.indexOf source "<p class=\"search-result__snippet\">" 0) 34 )
           
-          (+
-            (.indexOf source "<p class=\"search-info\">"
-                  (+ (.indexOf source "<dd>" 0) 0)
-            ) 0
+          (-
+            (.indexOf source "<p class=\"search-result__info\">"
+                  (+ (.indexOf source "<p class=\"search-result__snippet\">" 0) 0)
+            ) 4
           )
        )
        updated (subs source
             
             ( + (.indexOf  source  "</a>"
-                (+ (.indexOf source "<dd>"  (+ (.indexOf source "</dt>" 0) 0 ) ) 0 )
+                (+ (.indexOf source "<p class=\"search-result__info\">") 0 )
             ) 7 )
             
-            ( + (.indexOf source "</a>"
-               (+ (.indexOf source "<dd>"  (+ (.indexOf source "</dt>" 0) 0 ) ) 0 )
+            ( + (.indexOf  source  "</a>"
+                (+ (.indexOf source "<p class=\"search-result__info\">") 0 )
             ) 25 )
           )
-      reference (if (= (str/index-of (URLDecoder/decode reference1 "UTF-8") "http://www.zerohedge.com/") nil)  reference1 (subs reference1 30))
+      reference (if (= (str/index-of (URLDecoder/decode reference1 "UTF-8") "https://www.zerohedge.com/") nil)  reference1 (subs reference1 30))
     ]
     ;(println "==================")
     ;(println updated)
@@ -110,8 +110,8 @@
 (defn download-zerohedge-byid [search id]
   (let [
         page (if (= id 0) 
-               (client/post (str "http://www.zerohedge.com/search/apachesolr_search/" search))
-               (client/get (str "http://www.zerohedge.com/search/apachesolr_search/" search "?page=" id))
+               (client/post (str "https://www.zerohedge.com/search/node?keys=/" search))
+               (client/get (str "https://www.zerohedge.com/search/node?keys=/" search "&page=" id))
 
              )
         ]
@@ -168,8 +168,8 @@
   (    
     let [ 
     page1 page ;(slurp "E://DEV//clojure//zerohedgecl//doc//testsrch.txt")
-    mainContent (nth (str/split page1 #"<dl class=\"search-results apachesolr_search-results\">") 1) 
-    contentItems (str/split mainContent #"<dt class=\"title\">")
+    mainContent (nth (str/split page1 #"<ol class=\"search-results node_search-results\">") 1) 
+    contentItems (str/split mainContent #"<h3 class=\"search-result__title\">")
     contentItemsCount (count contentItems)
     items (take-last (- contentItemsCount 1) contentItems)
     outarr (map parse-srch-itemrow items)

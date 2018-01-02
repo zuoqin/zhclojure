@@ -6,8 +6,7 @@
             [ring.middleware.webjars :refer [wrap-webjars]]
             [ring.middleware.format :refer [wrap-restful-format]]
             [zhluminus.config :refer [env]]
-            [ring.middleware.flash :refer [wrap-flash]]
-            [immutant.web.middleware :refer [wrap-session]]
+            [ring-ttl-session.core :refer [ttl-memory-store]]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]])
   (:import [javax.servlet ServletContext]))
 
@@ -56,11 +55,9 @@
 (defn wrap-base [handler]
   (-> ((:middleware defaults) handler)
       wrap-webjars
-      wrap-flash
-      (wrap-session {:cookie-attrs {:http-only true}})
       (wrap-defaults
         (-> site-defaults
             (assoc-in [:security :anti-forgery] false)
-            (dissoc :session)))
+            (assoc-in  [:session :store] (ttl-memory-store (* 60 30)))))
       wrap-context
       wrap-internal-error))

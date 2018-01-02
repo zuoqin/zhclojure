@@ -1,8 +1,4 @@
 {:dev true
- :port 10555
+ :port 3000
  ;; when :nrepl-port is set the application starts the nREPL server on load
- :nrepl-port 7000
- :ssl {:port              443
- :keystore          "/home/ubuntu/cacerts"
- :keystore-password "Qwerty123"}
- }
+ :nrepl-port 7000}
