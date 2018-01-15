@@ -66,11 +66,12 @@
           )          
           ; body
           
-          (str/replace (subs page 
+          (str/replace (str/replace (subs page 
                     (+ (.indexOf page ">" (.indexOf page "div property=\"schema:text\"" (.indexOf page "node__content" 0) ))1)
  
                     (- (.indexOf page "<div class=\"extras-section\">" (.indexOf page "node__content" 0))1)
                     ) #"src=\"/sites" "src=\"https://zerohedge.com/sites")
+                      #"srcset=\"/sites" "src=\"https://zerohedge.com/sites")
           
         )
 
