@@ -12,6 +12,9 @@
             [clojure.data.json :as json]
             [clj-http.client :as client]
             [zhluminus.config :refer [env]]
+
+            [zhluminus.routes.stories :as stories]
+
   )
 
 
@@ -100,6 +103,7 @@
                    
                    )  
               (json/read-str (slurp (str "http://192.168.85.128:" port "/api/stories?page=" pageid) ) )
+              ;(stories/get-items pageid)
  ) 
 
         ]
@@ -184,9 +188,10 @@
   )
 )
 
-(defn stories-page [pageid]
-  (layout/render
-    "stories.html" {:stories (show-items pageid) :pageid pageid}
+(defn stories-page [request]
+  (let [id (if (nil? (:id (:params request))) 0 (:id (:params request)))]
+    ;(println (str "66666666666" (:params request)))
+    (layout/render request "stories.html" {:stories (show-items id) :pageid id})
   )
 )
 
@@ -198,14 +203,12 @@
 )
 
 
-(defn story-page [reference root]
-  (let [story  (download-story reference root)
+(defn story-page [request]
+  (let [story  (download-story (:url (:params request)) "hhhhhh")
         ]
     ;(println "reference=" reference)
     ;;(println story)
-    (layout/render
-        "story.html" {:story  story   }     ;
-      )
+    (layout/render request "story.html" {:story  story})
   )
 )
 
@@ -224,5 +227,8 @@
   [""
    {:middleware [middleware/wrap-csrf
                  middleware/wrap-formats]}
-   ["/" {:get home-page}]
-   ["/page" {:get about-page}]])
+   ["/" {:get stories-page}]
+   ["/story" {:get story-page}]
+   ["/page" {:get stories-page}]
+  ]
+)

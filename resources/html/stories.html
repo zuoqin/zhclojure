@@ -8,7 +8,7 @@
 
     <!-- styles -->
     {% style "/assets/bootstrap/css/bootstrap.min.css" %}
-    {% style "/assets/font-awesome/css/font-awesome.min.css" %}
+    {% style "/assets/font-awesome/css/all.css" %}
 
     {% style "/css/screen.css" %}
   </head>
@@ -70,7 +70,7 @@
         <div class="panel panel-primary">
           <div class="panel-heading">
             <h3 class="panel-title">
-              <a href="../story/{{story.reference}}">{{story.title|safe}}</a>
+              <a href="../story?url={{story.reference}}">{{story.title|safe}}</a>
             </h3>
           </div>
           <div class="panel-body">

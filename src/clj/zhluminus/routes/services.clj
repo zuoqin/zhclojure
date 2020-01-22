@@ -66,11 +66,23 @@
           :responses {200 {:body  [{ :title string? :updated string? :introduction string? :reference string?}]}}
           :handler (fn [{{{:keys [page]} :query} :parameters}]
                      {:status 200
-                      :body  (stories/get-items 0)})
+                      :body  (stories/get-items page)})
           }
     }
    ]
 
+   ["/story"
+    {:get
+         {
+          :summary      "One story data."
+          :parameters {:query {:url string?}}
+          :responses {200 {:body  [{ :title string? :updated string? :body string?}]}}
+          :handler (fn [{{{:keys [url]} :query} :parameters}]
+                     {:status 200
+                      :body  (stories/download-story url)})
+          }
+    }
+   ]
 
    ["/files"
     {:swagger {:tags ["files"]}}
@@ -93,5 +105,8 @@
                         :headers {"Content-Type" "image/png"}
                         :body (-> "public/img/warning_clojure.png"
                                   (io/resource)
-                                  (io/input-stream))})}}]]])
+                                  (io/input-stream))})}}]
+    ]
+  ]
+)
 

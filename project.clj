@@ -31,6 +31,9 @@
                  [clj-http "3.10.0"]
                  [compojure "1.6.1"]
                  [metosin/compojure-api "1.1.13"]
+                 [org.webjars/bootstrap "4.4.1"]
+                 [org.webjars/font-awesome "5.12.0"]
+                 [org.webjars.bower/tether "1.4.4"]
                  [selmer "1.12.18"]]
 
   :min-lein-version "2.0.0"
