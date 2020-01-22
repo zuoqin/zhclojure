@@ -33,70 +33,53 @@
        reference1 (str 
             (URLEncoder/encode (str ""
               (subs source 
-                (+
-                  (.indexOf source "href=\""
-                        (+ (.indexOf source "<h3 class=\"search-result__title\">" 0) 0 )
-                  )
-                  6
-                )
+                (+ (.indexOf source "href=\"") 6)
 
-                (.indexOf source "\">"
-                  (.indexOf source "href=\""
-                        (+ (.indexOf source "<h3 class=\"search-result__title\">" 0) 0 )
-                  )
+                (.indexOf source "\""
+                  (+ (.indexOf source "href=\"") 12)
                 )
               )            
             ) 
               "UTF-8"
             )
           )
-       ;res (println  )
        title (subs source 
           (+
             (.indexOf source ">"
-                  (+ (.indexOf source "<h3 class=\"search-result__title\">" 0) 35 )
+                  (+ (.indexOf source "href" 0) 5 )
             )
             1
           )
 
           (.indexOf source "</a>"
-                (+ (.indexOf source "<h3 class=\"search-result__title\">" 0) 35)
+                (+ (.indexOf source "<href" 0) 5)
           ) 
        )
        introduction (subs source 
-          (+ (.indexOf source "<p class=\"search-result__snippet\">" 0) 34 )
+          (+ (.indexOf source "class=\"views-field views-field-search-api-excerpt\">" 0) 51 )
           
-          (-
-            (.indexOf source "<p class=\"search-result__info\">"
-                  (+ (.indexOf source "<p class=\"search-result__snippet\">" 0) 0)
-            ) 4
+          (+
+            (.indexOf source "</span>"
+                  (+ (.indexOf source "class=\"views-field views-field-search-api-excerpt\">" 0) 52)
+            ) 7
           )
        )
        updated (subs source
             
-            ( + (.indexOf  source  "</a>"
-                (+ (.indexOf source "<p class=\"search-result__info\">") 0 )
-            ) 7 )
+            ( + (.indexOf  source  "field-content"
+                (+ (.indexOf source "class=\"views-field views-field-created\"") 0 )
+            ) 15 )
             
-            ( + (.indexOf  source  "</a>"
-                (+ (.indexOf source "<p class=\"search-result__info\">") 0 )
-            ) 25 )
+            ( + (.indexOf  source  "</span>"
+                (+ (.indexOf source "class=\"views-field views-field-created\"") 0 )
+            ) 0 )
           )
-      reference (if (= (str/index-of (URLDecoder/decode reference1 "UTF-8") "https://www.zerohedge.com/") nil)  reference1 (subs reference1 30))
+      reference (if (= (str/index-of (URLDecoder/decode reference1 "UTF-8") "https://www.zerohedge.com/") nil)  reference1 reference1)
     ]
-    ;(println "==================")
-    ;(println updated)
-    ;(println "=========================================================================")
     (createMessage
-
-      ;title
       title
-      ;(str "My Title") 
-      ;(str "My updated")
       updated
       introduction
-      ;(str "My Introduction")
-      ;(str "My reference")
       reference
     )  
   )
@@ -110,12 +93,11 @@
 (defn download-zerohedge-byid [search id]
   (let [
         page (if (= id 0) 
-               (client/post (str "https://www.zerohedge.com/search/node?keys=/" search))
-               (client/get (str "https://www.zerohedge.com/search/node?keys=/" search "&page=" id))
+               (client/get (str "https://www.zerohedge.com/search-content?search_api_fulltext=" search "&sort_by=search_api_relevance"))
+               (client/get (str "https://www.zerohedge.com/search-content?search_api_fulltext=" search "&sort_by=search_api_relevance" "&page=" id))
 
              )
         ]
-  ;(println "downloading page from zerohedge")
   (:body  page)
 
   )
@@ -138,14 +120,12 @@
       )
     )
     (download-zerohedge-byid search id)
-    ;(println "no need to refresh cache")
   )
 )
 
 (defn refresh-page-cache [search id array]
 
   (delete-page-by-number search id)
-  ;(println (nth array 0))
      ;; (swap! pages conj 
      ;;    { :pageid id :downloaded (now) :search search :updated (:updated (nth array 0)) 
      ;;      :introduction (:introduction x) :title (:title x) :reference (:reference x) 
@@ -153,7 +133,6 @@
      ;; )
 
   (doseq [x array] 
-     ;(println "updated = " (:updated x))
      (swap! pages conj 
         { :pageid id :downloaded (now) :search search :updated (:updated x) 
           :introduction (:introduction x) :title (:title x) :reference (:reference x) 
@@ -161,20 +140,18 @@
      )
   )
 
-  ;(println "count pages=" (count @pages))
 )
 
 (defn parse-zerohedge-page [page search id]
   (    
     let [ 
     page1 page ;(slurp "E://DEV//clojure//zerohedgecl//doc//testsrch.txt")
-    mainContent (nth (str/split page1 #"<ol class=\"search-results node_search-results\">") 1) 
-    contentItems (str/split mainContent #"<h3 class=\"search-result__title\">")
+    mainContent (nth (str/split page1 #"class=\"view-content\"") 2)
+    contentItems (str/split mainContent #"<div class=\"views-row\">")
     contentItemsCount (count contentItems)
     items (take-last (- contentItemsCount 1) contentItems)
     outarr (map parse-srch-itemrow items)
     ]
-    ;(println mainContent)
     (refresh-page-cache search id outarr)
     outarr
     ;contentItemsCount
@@ -205,7 +182,6 @@
     )
   )
 
-  ;(println "from loadPage")
 )
 
 

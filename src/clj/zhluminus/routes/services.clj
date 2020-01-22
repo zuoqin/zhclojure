@@ -84,29 +84,17 @@
     }
    ]
 
-   ["/files"
-    {:swagger {:tags ["files"]}}
-
-    ["/upload"
-
-     {:post {:summary "upload a file"
-             :parameters {:multipart {:file multipart/temp-file-part}}
-             :responses {200 {:body {:name string?, :size int?}}}
-             :handler (fn [{{{:keys [file]} :multipart} :parameters}]
-                        {:status 200
-                         :body {:name (:filename file)
-                                :size (:size file)}})}}]
-
-    ["/download"
-     {:get {:summary "downloads a file"
-            :swagger {:produces ["image/png"]}
-            :handler (fn [_]
-                       {:status 200
-                        :headers {"Content-Type" "image/png"}
-                        :body (-> "public/img/warning_clojure.png"
-                                  (io/resource)
-                                  (io/input-stream))})}}]
-    ]
-  ]
+   ["/search"
+    {:get
+         {
+          :summary      "Search web site for stories."
+          :parameters {:query {:srchtext  string? :page int?}}
+          :responses {200 {:body  [{ :title string? :updated string? :introduction string? :reference string?}]}}
+          :handler (fn [{{{:keys [srchtext page]} :query} :parameters}]
+                     {:status 200
+                      :body  (search/get-items srchtext page)})
+          }
+    }
+   ]
+ ]
 )
-

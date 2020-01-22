@@ -2,8 +2,8 @@
 
 ## RESTful API
 
-[ZeroHedge API](http://zuoqin.t5p.hk/swagger-ui)
+[ZeroHedge API](https://zh.eliz.club/swagger-ui)
 
 ## WEB
 
-[ZeroHedge](http://zuoqin.t5p.hk)
+[ZeroHedge](https://zh.eliz.club)

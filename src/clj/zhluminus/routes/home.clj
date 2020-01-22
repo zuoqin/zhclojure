@@ -195,10 +195,14 @@
   )
 )
 
-(defn search-stories-page [key pageid]
-  ;(println "key=" key)
-  (layout/render
-    "search.html" {:stories (show-search-items key pageid) :search key :pageid pageid}
+(defn search-stories-page [request]
+  (let [
+      key (:srchtext (:params request))
+      pageid (if (nil? (:page (:params request))) 0 (:page (:params request)))
+    ]
+    (layout/render request
+      "search.html" {:stories (show-search-items key pageid) :search key :pageid pageid}
+    )
   )
 )
 
@@ -230,5 +234,6 @@
    ["/" {:get stories-page}]
    ["/story" {:get story-page}]
    ["/page" {:get stories-page}]
+   ["/search" {:get search-stories-page}]
   ]
 )

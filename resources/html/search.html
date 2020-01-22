@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="img/favicon.ico" />
+    <title>ZeroHedge</title>
+
+    <!-- styles -->
+    {% style "/assets/bootstrap/css/bootstrap.min.css" %}
+    {% style "/assets/font-awesome/css/font-awesome.min.css" %}
+
+    {% style "/css/screen.css" %}
+  </head>
+  <body>
+      <!-- navbar -->
+      <nav class="navbar navbar-dark bg-primary navbar-fixed-top" style="padding-bottom: 0px;" role="navigation">
+          <button class="navbar-toggler hidden-sm-up"
+                  type="button"
+                  data-toggle="collapse"
+                  data-target="#collapsing-navbar">
+              &#9776;
+          </button>
+          <div class="collapse navbar-toggleable-xs" id="collapsing-navbar">
+            <a class="navbar-brand" href="{{servlet-context}}/" style="color:rgba(255,255,255,0.5)">Home</a>
+              <ul class="nav navbar-nav">
+                  <li class="nav-item">
+                      <a href="{{servlet-context}}/search?srchtext={{search}}&page=0"
+                         class="nav-link{% ifequal pageid 0 %} active{%endifequal%}">
+                      Page 1
+                      </a>
+                  </li>
+
+                  <li class="nav-item">
+                      <a href="{{servlet-context}}/search?srchtext={{search}}&page=1"
+                         class="nav-link{% ifequal pageid 1 %} active{%endifequal%}">
+                      Page 2
+                      </a>
+                  </li>
+
+                  <li class="nav-item">
+                      <a href="{{servlet-context}}/search?srchtext={{search}}&page=2"
+                         class="nav-link{% ifequal pageid 2 %} active{%endifequal%}">
+                      Page 3
+                      </a>
+                  </li>
+
+
+                  <li class="nav-item">
+                      <a href="{{servlet-context}}/search?srchtext={{search}}&page=3"
+                         class="nav-link{% ifequal pageid 3 %} active{%endifequal%}">
+                      Page 4
+                      </a>
+                  </li>                  
+              </ul>
+		  		<ul style="margin-left:0px; padding: 0px;" class="pull-right">
+
+		  				<form class="form-wrapper cf" action="search" id="searchform">
+		  					<input placeholder="Search" type="text" name="srchtext" maxlength="120" />
+		  					<button type="submit" form="searchform">Search</button>
+		  				</form>
+
+		  		</ul>
+
+          </div>
+      </nav>
+
+      <div id="blogItems" class="col-md-12">
+        {% for story in stories %}
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              <a href="../../../story?url={{story.reference}}">{{story.title|safe}}</a>
+            </h3>
+          </div>
+          <div class="panel-body">
+            {{story.introduction|safe}}
+            {{story.updated|safe}}
+          </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- scripts -->
+    {% script "/assets/jquery/jquery.min.js" %}
+    {% script "/assets/tether/dist/js/tether.min.js" %}
+    {% script "/assets/bootstrap/js/bootstrap.min.js" %}
+
+    <script type="text/javascript">
+      var context = "{{servlet-context}}";
+    </script>
+    {% block page-scripts %}
+    {% endblock %}
+  </body>
+</html>
