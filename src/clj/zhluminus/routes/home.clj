@@ -1,20 +1,23 @@
 (ns zhluminus.routes.home
-  (:require [zhluminus.layout :as layout]
-            [compojure.core :refer [defroutes GET]]
-            [ring.util.http-response :as response]
-            [clojure.java.io :as io]
+  (:require
+   [zhluminus.layout :as layout]
+   [clojure.java.io :as io]
+   [zhluminus.middleware :as middleware]
+   [ring.util.response]
+   [ring.util.http-response :as response]
+
             [clojure.string :as str]
             [clj-time.core :as t]
             [clj-time.format :as f]
             [clojure.data.json :as json]
             [clj-http.client :as client]
             [zhluminus.config :refer [env]]
-            )
+  )
+
 
   (:import [java.net URLEncoder]
     [java.net URLDecoder]
   )
-
 )
 
 (def stories (atom []))
@@ -96,7 +99,7 @@
                    
                    
                    )  
-              (json/read-str (slurp (str "http://127.0.0.1:" port "/api/stories?page=" pageid) ) )
+              (json/read-str (slurp (str "http://192.168.85.128:" port "/api/stories?page=" pageid) ) )
  ) 
 
         ]
@@ -211,16 +214,15 @@
   (println request)
 )
 
-(defroutes stories-routes
-  (GET "/" [] (stories-page 0))
-  (GET "/page/:id" [id] (stories-page id))
-  ;(GET "/story/:reference" [reference] (story-page reference))
-  (GET "/story*" params (story-page (URLEncoder/encode (str "" (subs (:uri params)  (+ (.indexOf (:uri params) "/story/") 6 )  )    ))  (str (:schema params) "//" (:server-name params) (if (= (:server-port params) 80) "" (str ":" (:server-port params) )  )   
+(defn home-page [request]
+  (layout/render request "home.html" {:docs (-> "docs/docs.md" io/resource slurp)}))
 
+(defn about-page [request]
+  (layout/render request "about.html"))
 
-
-)))
-  (GET "/search/:key/:page" [key page] (search-stories-page key page))
-  (GET "/search*" {params :query-params} (search-stories-page (get params "srchtext")  (if (= (get params "page") nil) 0 (get params "page")) ))
-  (GET "/test*" params (testreq params))  
-)
+(defn stories-routes []
+  [""
+   {:middleware [middleware/wrap-csrf
+                 middleware/wrap-formats]}
+   ["/" {:get home-page}]
+   ["/page" {:get about-page}]])
