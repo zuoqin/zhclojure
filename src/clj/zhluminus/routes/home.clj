@@ -28,11 +28,11 @@
 (defn now [] (new java.util.Date))
 
 
-(defn replaceLinks [body root]
+(defn replaceLinks [body]
   (let[
-          list1 [ "https://www.zerohedge.com/news/" "https://www.zerohedge.com/article/" ]
-          newbody1 (str/replace body (nth list1 0) (str root "/story/news/") )
-          newbody2 (str/replace newbody1 (nth list1 1) (str root "/story/news/" ) )
+          list1 [ "https://www.zerohedge.com" ]
+          newbody1 (str/replace body (nth list1 0) (str "/story?url=") )
+          newbody2 (str/replace newbody1 "/s3/files" "https://www.zerohedge.com/s3/files" )
   ]
   ;(println root)
   newbody2
@@ -63,7 +63,7 @@
     listofintro
       (if (= (count (filter #(= (compare (% :reference) reference) 0 ) @stories )) 0) 
         
-        {:body (replaceLinksBack(replaceLinks (get story "body" ) root))  :title (get story "title" ) :updated (get story "updated" )} 
+        {:body (replaceLinksBack(replaceLinks (get story "body" )))  :title (get story "title" ) :updated (get story "updated" )} 
         (first (filter #(= (compare (% :reference) reference) 0 ) @stories )) 
       )
     
@@ -102,7 +102,7 @@
                    
                    
                    )  
-              (json/read-str (slurp (str "http://192.168.85.128:" port "/api/stories?page=" pageid) ) )
+              (json/read-str (slurp (str "http://127.0.0.1:" port "/api/stories?page=" pageid) ) )
               ;(stories/get-items pageid)
  ) 
 
