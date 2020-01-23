@@ -63,7 +63,7 @@
          {
           :summary      "Stories for given page."
           :parameters {:query {:page int?}}
-          :responses {200 {:body  [{ :title string? :updated string? :introduction string? :reference string?}]}}
+          :responses {200 {:body  [{ :title string? :updated string? :introduction string? :reference string? :picture string?}]}}
           :handler (fn [{{{:keys [page]} :query} :parameters}]
                      {:status 200
                       :body  (stories/get-items page)})
