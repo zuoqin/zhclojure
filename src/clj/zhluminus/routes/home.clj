@@ -30,12 +30,14 @@
 
 (defn replaceLinks [body]
   (let[
-          list1 [ "https://www.zerohedge.com" ]
-          newbody1 (str/replace body (nth list1 0) (str "/story?url=") )
-          newbody2 (str/replace newbody1 "/s3/files" "https://www.zerohedge.com/s3/files" )
+          list1 [ "https://www.zerohedge.com/news" "https://www.zerohedge.com/article" ]
+          newbody1 (str/replace body (nth list1 0) (str "/story?url=%2Fnews") )
+          newbody2 (str/replace newbody1 (nth list1 1) (str "/story?url=%2Farticle") )
+
+          newbody3 (str/replace newbody2 "\"/s3/files" "\"https://www.zerohedge.com/s3/files" )
   ]
   ;(println root)
-  newbody2
+  newbody3
   )
 )
 
