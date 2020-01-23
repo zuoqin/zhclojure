@@ -55,19 +55,14 @@
           
           ;updated
           (subs page 
+            (.indexOf page "<div class=\"submitted-datetime" 0)
             
-            ( + (.indexOf page ">"
-                (+ (.indexOf page "span property=\"schema:dateCreated\""  (+ (.indexOf page "submitted-datetime" 0) 0 ) ) 0 )
-            ) 1 )
-            
-            ( - (.indexOf page "</span>"
-               (+ (.indexOf page "span property=\"schema:dateCreated\""  (+ (.indexOf page "submitted-datetime" 0) 0 ) ) 0 )
-            ) 0 )
+            (+ (.indexOf page "</div>" (.indexOf page "<div class=\"submitted-datetime" 0)) 6)
           )          
           ; body
           
           (str/replace (str/replace (subs page 
-                    (+ (.indexOf page ">" (.indexOf page "div property=\"schema:text\"" (.indexOf page "node__content" 0) ))1)
+                    (.indexOf page "<div class=\"node__content\"" 0)
  
                     (- (.indexOf page "<div class=\"extras-section\">" (.indexOf page "node__content" 0))1)
                     ) #"src=\"/sites" "src=\"https://zerohedge.com/sites")
