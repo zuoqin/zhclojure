@@ -100,6 +100,7 @@
                           :updated (get x "updated")
                           :title (get x "title")
                           :reference (get x "reference")
+                          :picture (get x "picture")
                           }
                    
                    

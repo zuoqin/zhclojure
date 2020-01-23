@@ -91,9 +91,9 @@
 )
 
 
-(defn createMessage [title updated introduction reference]
+(defn createMessage [title updated introduction reference picture]
   (let []
-    { :title title :updated updated :introduction introduction :reference reference}
+    { :title title :updated updated :introduction introduction :reference reference :picture picture}
   )
 )
 
@@ -151,6 +151,30 @@
         )
       )
 
+    picture
+      (str/replace (subs source
+        (+ (.indexOf source "src="
+            (+ (.indexOf source "teaser-image"
+              (+ teasertitleind 15)
+              )
+              0
+            )
+          )
+          5
+        )
+
+        (-
+          (.indexOf source "\""
+            ( + (.indexOf source "src="
+              (+ (.indexOf source "teaser-image"  (+ teasertitleind 15 ))
+                0
+              )
+            ) 10 )
+          )
+          0
+        )
+      ) #"/s3/files/" "https://zerohedge.com/s3/files/")
+
     introduction (subs source 
           (+ 
             (.indexOf source ">"
@@ -192,20 +216,12 @@
           )
         )   
     ]
-    ;(println "==================")
-    ;(println updated)
-    ;(println "=========================================================================")
     (createMessage
-
-      ;title
       title
-      ;(str "My Title") 
-      ;(str "My updated")
       updated
       introduction
-      ;(str "My Introduction")
-      ;(str "My reference")
       reference
+      picture
     )  
   )
 )
@@ -246,7 +262,7 @@
   (doseq [x array] 
 
      (swap! pages conj 
-        {:pageid id :downloaded (now) :updated (:updated x) :introduction (:introduction x) :title (:title x) :reference (:reference x) }
+        {:pageid id :downloaded (now) :updated (:updated x) :introduction (:introduction x) :title (:title x) :reference (:reference x) :picture (:picture x)}
      )
   )
 )
