@@ -35,6 +35,9 @@
           newbody2 (str/replace newbody1 (nth list1 1) (str "/story?url=%2Farticle") )
 
           newbody3 (str/replace newbody2 "\"/s3/files" "\"https://www.zerohedge.com/s3/files" )
+          newbody3 (str/replace newbody3 "https://www.zerohedge.com/markets" "https://news.ehedge.xyz/story?url=/markets")
+          newbody3 (str/replace newbody3 "https://www.zerohedge.com/health" "https://news.ehedge.xyz/story?url=/health")
+          newbody3 (str/replace newbody3 "https://www.zerohedge.com/economics" "https://news.ehedge.xyz/story?url=/economics")
   ]
   ;(println root)
   newbody3
